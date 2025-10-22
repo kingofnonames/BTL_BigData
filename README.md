@@ -1,5 +1,8 @@
 # Dự án Thu thập và Phân tích Dữ liệu Chứng khoán Việt Nam
 
+Pipeline:   
+![Kien truc su dung](./pipe_line.png)
+
 ## 📋 Giới thiệu
 Dự án sử dụng thư viện **vnstock3** để thu thập dữ liệu chứng khoán từ thị trường Việt Nam, bao gồm:
 - 📊 **OHLCV**: Dữ liệu giá lịch sử (Open, High, Low, Close, Volume)
