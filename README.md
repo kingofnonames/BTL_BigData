@@ -217,38 +217,3 @@ ticker,yearReport,revenue,profit,asset,equity
 FPT,2023,50000,8000,45000,25000
 FPT,2022,45000,7000,42000,23000
 ```
-
-## ⚠️ Lưu ý
-
-1. **Rate Limiting**: Có delay giữa các request để tránh bị chặn
-2. **Data Source**: Mặc định sử dụng VCI, có thể đổi sang TCBS
-3. **Error Handling**: Pipeline tự động bỏ qua lỗi và tiếp tục
-4. **Logs**: Kiểm tra thư mục `logs/` để debug
-
-## 🐛 Xử lý lỗi thường gặp
-
-### Lỗi: Import "vnstock3" could not be resolved
-```bash
-pip install vnstock3
-```
-
-### Lỗi: No data returned
-- Kiểm tra mã cổ phiếu có đúng không
-- Kiểm tra khoảng thời gian
-- Thử đổi nguồn dữ liệu (VCI <-> TCBS)
-
-### Lỗi: Rate limit exceeded
-- Tăng `REQUEST_DELAY` trong `config.py`
-
-## 📚 Tài liệu tham khảo
-- [vnstock3 Documentation](https://github.com/thinh-vu/vnstock)
-- [Pandas Documentation](https://pandas.pydata.org/docs/)
-
-## 🤝 Đóng góp
-Mọi đóng góp đều được hoan nghênh! Vui lòng tạo issue hoặc pull request.
-
-## 📄 License
-MIT License
-
-## 👥 Tác giả
-BTL_BigData Team
