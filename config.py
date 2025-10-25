@@ -20,7 +20,7 @@ class Config:
         'VPB',   # VPBank
     ]
     
-    # Nguồn dữ liệu (VCI hoặc TCBS)
+    # Nguồn dữ liệu (VCI, TCBS, MSN)
     # Note: VCI có thể bị 403, thử dùng TCBS
     DATA_SOURCE = 'TCBS'
     

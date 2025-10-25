@@ -84,6 +84,47 @@ class HistoricalOHLCVCrawler:
             print(f"✗ Lỗi khi lưu file: {e}")
             return False
 
+    def resample_ohlcv(self, data: pd.DataFrame, interval: str):
+        # 1️⃣ Tìm cột thời gian hợp lệ
+        time_cols = ['timestamp', 'time', 'date', 'Date', 'datetime']
+        time_col = None
+        for col in time_cols:
+            if col in data.columns:
+                time_col = col
+                break
+
+        if time_col is None:
+            logging.error(f"[Resample] Không tìm thấy cột thời gian trong DataFrame! Các cột hiện có: {data.columns.tolist()}")
+            return None
+
+        # 2️⃣ Chuẩn hóa thời gian
+        data[time_col] = pd.to_datetime(data[time_col], errors='coerce')
+        data = data.dropna(subset=[time_col])
+        data.set_index(time_col, inplace=True)
+
+        # 3️⃣ Chọn quy tắc resample
+        if interval == '1D':
+            return data.reset_index()
+        elif interval == '1W':
+            rule = 'W'
+        elif interval == '1M':
+            rule = 'M'
+        else:
+            raise ValueError(f"Unsupported interval: {interval}")
+
+        # 4️⃣ Thực hiện resample
+        ohlcv_resampled = data.resample(rule).agg({
+            'open': 'first',
+            'high': 'max',
+            'low': 'min',
+            'close': 'last',
+            'volume': 'sum'
+        }).dropna()
+
+        ohlcv_resampled.reset_index(inplace=True)
+        return ohlcv_resampled
+
+
 def main():
     # Thiết lập tham số
     symbol = 'FPT'
@@ -110,7 +151,7 @@ def main():
         )
     
     # 2. Dữ liệu theo tuần (1W)
-    weekly_data = crawler.get_historical_data(start_date, end_date, interval='1W')
+    weekly_data = crawler.resample_ohlcv(daily_data, interval='1W') if daily_data is not None else None
     if weekly_data is not None:
         print("\n--- 5 dòng đầu tiên (Weekly) ---")
         print(weekly_data.head())
@@ -120,7 +161,7 @@ def main():
         )
     
     # 3. Dữ liệu theo tháng (1M)
-    monthly_data = crawler.get_historical_data(start_date, end_date, interval='1M')
+    monthly_data = crawler.resample_ohlcv(daily_data, interval='1M') if daily_data is not None else None
     if monthly_data is not None:
         print("\n--- 5 dòng đầu tiên (Monthly) ---")
         print(monthly_data.head())
