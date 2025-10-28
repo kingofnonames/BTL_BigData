@@ -46,64 +46,12 @@ source .venv/bin/activate  # Linux/Mac
 ```bash
 pip install -r requirements.txt
 ```
-
-## 📖 Hướng dẫn sử dụng
-
-### 1. Cấu hình
-Chỉnh sửa `config.py` để thiết lập:
-- Danh sách mã cổ phiếu cần crawl
-- Khoảng thời gian
-- Các loại dữ liệu cần thu thập
-
-```python
-# Ví dụ trong config.py
-SYMBOLS = ['FPT', 'VNM', 'VCB', 'HPG', 'VHM']
-START_DATE_3Y = '2022-01-01'
-```
-
-### 2. Chạy các crawler riêng lẻ
-
-#### Thu thập dữ liệu OHLCV
-```bash
-python historical_ohlcv_crawler.py
-```
-
-#### Thu thập dữ liệu Fundamental
-```bash
-python fundamental_analyst_crawler.py
-```
-
-#### Thu thập dữ liệu Market
-```bash
-python market_crawler.py
-```
-
-### 3. Chạy toàn bộ pipeline
-```bash
-python pipeline.py
-```
-
-Pipeline sẽ tự động:
-- Thu thập dữ liệu cho tất cả mã trong config
-- Lưu vào các thư mục tương ứng
-- Ghi log quá trình thực hiện
-- Hiển thị tổng kết
-
 ## 📝 Chi tiết các module
 
 ### 1. `historical_ohlcv_crawler.py`
 Thu thập dữ liệu giá lịch sử:
 - Daily (1D), Weekly (1W), Monthly (1M)
 - Intraday (dữ liệu trong ngày)
-
-**Sử dụng:**
-```python
-from historical_ohlcv_crawler import HistoricalOHLCVCrawler
-
-crawler = HistoricalOHLCVCrawler('FPT')
-data = crawler.get_historical_data('2024-01-01', '2024-12-31', interval='1D')
-crawler.save_data(data, 'FPT_daily.csv')
-```
 
 ### 2. `fundamental_analyst_crawler.py`
 Thu thập dữ liệu phân tích cơ bản:
@@ -112,57 +60,13 @@ Thu thập dữ liệu phân tích cơ bản:
 - Chỉ số tài chính
 - Lịch sử cổ tức
 
-**Sử dụng:**
-```python
-from fundamental_analyst_crawler import FundamentalCrawler
-
-crawler = FundamentalCrawler('FPT')
-profile = crawler.get_company_profile()
-balance_sheet = crawler.get_financial_report('BalanceSheet', 'year')
-```
-
 ### 3. `market_crawler.py`
 Thu thập dữ liệu thị trường:
 - Chỉ số VN-Index, HNX-Index
 - Danh sách tất cả mã cổ phiếu theo sàn
 
-**Sử dụng:**
-```python
-from market_crawler import MarketCrawler
-
-crawler = MarketCrawler()
-vnindex = crawler.get_market_index('VNINDEX')
-symbols = crawler.get_all_symbols('HOSE')
-```
-
 ### 4. `save.py`
 Utilities để lưu trữ và quản lý file:
-
-**Sử dụng:**
-```python
-from save import DataSaver
-
-saver = DataSaver()
-saver.save_csv(data, 'filename.csv', subdirectory='ohlcv')
-files = saver.list_files('ohlcv')
-info = saver.get_file_info('ohlcv')
-```
-
-### 5. `pipeline.py`
-Điều phối toàn bộ quá trình thu thập:
-
-**Sử dụng:**
-```python
-from pipeline import StockDataPipeline
-
-# Sử dụng config mặc định
-pipeline = StockDataPipeline()
-pipeline.run()
-
-# Hoặc custom danh sách mã
-pipeline = StockDataPipeline(symbols=['FPT', 'VNM'])
-pipeline.run(crawl_ohlcv=True, crawl_fundamental=True, crawl_market=False)
-```
 
 ## ⚙️ Tùy chỉnh
 
