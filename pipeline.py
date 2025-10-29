@@ -52,19 +52,28 @@ class StockDataPipeline:
         try:
             crawler = HistoricalOHLCVCrawler(symbol, source=Config.DATA_SOURCE)
             
-            # Crawl theo các interval khác nhau
             for interval in CrawlerConfig.OHLCV['intervals']:
-                data = crawler.get_historical_data(
-                    start_date=CrawlerConfig.OHLCV['start_date'],
-                    end_date=Config.END_DATE,
-                    interval=interval
-                )
-                
-                if data is not None:
-                    filename = f"{symbol}_{interval}_{datetime.now().strftime('%Y%m%d')}.csv"
-                    self.saver.save_csv(data, filename, subdirectory='ohlcv')
-                
-                time.sleep(Config.REQUEST_DELAY)
+                if interval == '1D':
+                     data = crawler.get_historical_data(
+                     start_date=CrawlerConfig.OHLCV['start_date'],
+                     end_date=Config.END_DATE,
+                     interval=interval
+                     )
+                     if data is not None:
+                          filename = f"{symbol}_{interval}_{datetime.now().strftime('%Y%m%d')}.csv"
+                          self.saver.save_csv(data, filename, subdirectory='ohlcv')
+                          time.sleep(Config.REQUEST_DELAY)
+                else: 
+                    data = crawler.get_historical_data(
+                        start_date=CrawlerConfig.OHLCV['start_date'],
+                        end_date=Config.END_DATE,
+                        interval='1D' 
+                    )
+                    resampled_data = crawler.resample_ohlcv(data, interval)
+                    if resampled_data is not None:
+                        filename = f"{symbol}_{interval}_{datetime.now().strftime('%Y%m%d')}.csv"
+                        self.saver.save_csv(resampled_data, filename, subdirectory='ohlcv')
+                        time.sleep(Config.REQUEST_DELAY)
             
             # Crawl intraday nếu được bật
             if CrawlerConfig.OHLCV['include_intraday']:

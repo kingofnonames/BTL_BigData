@@ -29,7 +29,7 @@ def example_1_ohlcv():
         print(f"- Số dòng: {len(daily_data)}")
         print(f"- Columns: {list(daily_data.columns)}")
         print("\nMẫu dữ liệu:")
-        print(daily_data.head(3))
+        print(daily_data.head(20))
         
         # Tính toán đơn giản
         print(f"\n- Giá cao nhất: {daily_data['high'].max():.2f}")
@@ -41,7 +41,7 @@ def example_1_ohlcv():
     weekly_data = crawler.get_historical_data(start_date, end_date, interval='1W')
     if weekly_data is not None:
         print(f"- Số dòng: {len(weekly_data)}")
-        print(weekly_data.head(2))
+        print(weekly_data.head(10))
 
 def example_2_fundamental():
     """Ví dụ 2: Lấy dữ liệu Fundamental"""
