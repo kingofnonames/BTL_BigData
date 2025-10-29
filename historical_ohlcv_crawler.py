@@ -6,6 +6,7 @@ from vnstock import Vnstock
 import pandas as pd
 from datetime import datetime, timedelta
 import os
+import logging
 
 class HistoricalOHLCVCrawler:
     def __init__(self, symbol, source='VCI'):
