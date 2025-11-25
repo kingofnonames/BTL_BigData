@@ -5,6 +5,6 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src ./src/
+COPY src .
 
-CMD ["python3", "src/pipeline.py"]
+CMD ["python3", "pipeline.py"]

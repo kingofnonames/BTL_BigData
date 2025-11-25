@@ -1,123 +1,77 @@
-# Dự án Thu thập và Phân tích Dữ liệu Chứng khoán Việt Nam
+# 📦 Crawler – Thu thập dữ liệu chứng khoán Việt Nam
 
-Pipeline:   
-![Kien truc su dung](./pipe_line.png)
+Crawler thu thập dữ liệu chứng khoán Việt Nam, bao gồm **OHLCV**, **Fundamental**, và **Market**, với khả năng chạy độc lập hoặc trong pipeline tổng thể.
+
+---
 
 ## 📋 Giới thiệu
-Dự án sử dụng thư viện **vnstock3** để thu thập dữ liệu chứng khoán từ thị trường Việt Nam, bao gồm:
-- 📊 **OHLCV**: Dữ liệu giá lịch sử (Open, High, Low, Close, Volume)
-- 📈 **Fundamental**: Báo cáo tài chính, chỉ số tài chính, thông tin công ty
-- 📉 **Market**: Chỉ số thị trường (VN-Index, HNX-Index), danh sách cổ phiếu
 
-## 🏗️ Cấu trúc thư mục
-```
-BTL_BigData/
-├── config.py                          # File cấu hình (danh sách mã, tham số)
-├── pipeline.py                        # Pipeline chính điều phối toàn bộ
-├── historical_ohlcv_crawler.py        # Crawler dữ liệu OHLCV
-├── fundamental_analyst_crawler.py     # Crawler dữ liệu fundamental
-├── market_crawler.py                  # Crawler dữ liệu thị trường
-├── save.py                            # Utilities lưu trữ dữ liệu
-├── requirements.txt                   # Dependencies
-├── data/                              # Thư mục chứa dữ liệu
-│   ├── ohlcv/                        # Dữ liệu giá
-│   ├── fundamental/                   # Dữ liệu tài chính
-│   └── market/                        # Dữ liệu thị trường
-└── logs/                              # Log files
-```
+Crawler sử dụng thư viện **vnstock3** để thu thập dữ liệu từ các sàn HOSE, HNX, UPCOM:
 
-## 🚀 Cài đặt
+- **OHLCV**: Dữ liệu giá lịch sử (Open, High, Low, Close, Volume)  
+- **Fundamental**: Báo cáo tài chính, chỉ số tài chính, thông tin công ty  
+- **Market**: Chỉ số thị trường (VN-Index, HNX-Index), danh sách cổ phiếu  
 
-### 1. Clone repository
+Crawler có thể chạy từng module riêng hoặc chạy toàn bộ pipeline.
+
+---
+
+## 🏗️ Cấu trúc thư mục (hiển thị folder, bỏ `data` và `.py`)
+
+crawler/
+├── Dockerfile
+├── README.md
+├── requirements.txt
+└── src/ # Source code crawler
+└── pycache/
+
+
+---
+
+## 🚀 Hướng dẫn sử dụng
+
+### 1️⃣ Clone repository
+
 ```bash
 git clone <repository-url>
-cd BTL_BigData
-```
+cd crawler
 
-### 2. Tạo virtual environment (khuyến nghị)
-```bash
+2️⃣ Tạo virtual environment (khuyến nghị)
+
 python -m venv .venv
 source .venv/bin/activate  # Linux/Mac
 # hoặc
 .venv\Scripts\activate     # Windows
-```
 
-### 3. Cài đặt dependencies
-```bash
+3️⃣ Cài đặt thư viện Python
+
 pip install -r requirements.txt
-```
-## 📝 Chi tiết các module
 
-### 1. `historical_ohlcv_crawler.py`
-Thu thập dữ liệu giá lịch sử:
-- Daily (1D), Weekly (1W), Monthly (1M)
-- Intraday (dữ liệu trong ngày)
+🐳 Chạy crawler với Docker
+1️⃣ Build Docker image
 
-### 2. `fundamental_analyst_crawler.py`
-Thu thập dữ liệu phân tích cơ bản:
-- Thông tin công ty
-- Báo cáo tài chính (BCĐKT, KQKD, LCTT)
-- Chỉ số tài chính
-- Lịch sử cổ tức
+docker build -t bigdata/crawler:latest .
 
-### 3. `market_crawler.py`
-Thu thập dữ liệu thị trường:
-- Chỉ số VN-Index, HNX-Index
-- Danh sách tất cả mã cổ phiếu theo sàn
+2️⃣ Chạy container với volume mount
 
-### 4. `save.py`
-Utilities để lưu trữ và quản lý file:
+docker run -it \
+  -v /home/anh/crawler_data:/app/data \
+  -v /home/anh/crawler_logs:/app/logs \
+  bigdata/crawler:latest python3 src/pipeline.py
 
-## ⚙️ Tùy chỉnh
+    /app/data → mount ra host folder /home/anh/crawler_data
 
-### Thêm mã cổ phiếu mới
-Chỉnh sửa `config.py`:
-```python
-SYMBOLS = [
-    'FPT', 'VNM', 'VCB',  # Mã hiện có
-    'MSN', 'MWG', 'POW',  # Thêm mã mới
-]
-```
+    /app/logs → mount ra host folder /home/anh/crawler_logs
 
-### Thay đổi khoảng thời gian
-```python
-# Trong config.py
-START_DATE_3Y = (datetime.now() - timedelta(days=365*3)).strftime('%Y-%m-%d')
-```
+    Chỉ mount các folder cần thiết để không ghi đè code trong container.
 
-### Tắt/bật các crawler
-```python
-# Trong config.py
-class CrawlerConfig:
-    OHLCV = {'enabled': True}
-    FUNDAMENTAL = {'enabled': True}
-    MARKET = {'enabled': False}  # Tắt crawler market
-```
+3️⃣ Debug interactive container
 
-## 🔍 Kiểm tra dữ liệu đã thu thập
+docker run -it \
+  -v ../crawler:/app/data \
+  -v ../crawler_logs:/app/logs \
+  bigdata/crawler:latest bash
 
-```bash
-# Xem danh sách files
-ls -lh data/ohlcv/
-ls -lh data/fundamental/
-ls -lh data/market/
+    Trong container: chạy thử pipeline hoặc các module riêng:
 
-# Hoặc sử dụng Python
-python -c "from save import DataSaver; saver = DataSaver(); print(saver.get_file_info('ohlcv'))"
-```
-
-## 📊 Output mẫu
-
-### OHLCV Data
-```csv
-time,open,high,low,close,volume
-2024-01-02,85.5,86.2,85.0,86.0,2500000
-2024-01-03,86.0,87.5,85.8,87.2,3100000
-```
-
-### Fundamental Data
-```csv
-ticker,yearReport,revenue,profit,asset,equity
-FPT,2023,50000,8000,45000,25000
-FPT,2022,45000,7000,42000,23000
-```
+python3 src/pipeline.py
