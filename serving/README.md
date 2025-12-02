@@ -29,6 +29,7 @@ Bash
 
 git clone <repository-url>
 cd serving
+
 2. Tạo virtual environment (khuyến nghị)
 Bash
 
@@ -36,6 +37,7 @@ python -m venv .venv
 source .venv/bin/activate  # Linux/Mac
 
 .venv\Scripts\activate     # Windows
+
 3️. Cài đặt thư viện Python
 Bash
 
@@ -96,5 +98,6 @@ curl http://elasticsearch:9200
 
 # Chạy job thủ công
 python3 src/serving_layer.py
+
 
 
