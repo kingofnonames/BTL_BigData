@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: crawler-deployment
+  labels:
+    app: crawler
 spec:
   replicas: 1
   selector:
@@ -13,8 +15,22 @@ spec:
         app: crawler
     spec:
       containers:
-      - name: crawler
-        image: nonamesak57/crawler:v1
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 80
+        - name: crawler
+          image: bigdata/crawler:latest
+          imagePullPolicy: Never
+          workingDir: /app
+          command: ["python3", "pipeline.py"]
+          volumeMounts:
+            - name: data-volume
+              mountPath: /app/data
+            - name: logs-volume
+              mountPath: /app/logs
+      volumes:
+        - name: data-volume
+          hostPath:
+            path: /home/anh/Documents/Big_Data/BTL_BigData/crawler/data
+            type: DirectoryOrCreate
+        - name: logs-volume
+          hostPath:
+            path: /home/anh/Documents/Big_Data/BTL_BigData/crawler/logs
+            type: DirectoryOrCreate
