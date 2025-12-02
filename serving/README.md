@@ -23,7 +23,7 @@ serving/
 ├── requirements.txt
 └── src/                 # Source code Spark jobs
     └── __pycache__/
-Hướng dẫn sử dụng
+#Hướng dẫn sử dụng
 1. Clone repository
 Bash
 
@@ -34,7 +34,7 @@ Bash
 
 python -m venv .venv
 source .venv/bin/activate  # Linux/Mac
-# hoặc
+
 .venv\Scripts\activate     # Windows
 3️. Cài đặt thư viện Python
 Bash
@@ -42,7 +42,7 @@ Bash
 pip install -r requirements.txt
 (Yêu cầu: Đã cài đặt Java JDK 11 để chạy Spark local)
 
-Chạy Serving Layer với Docker
+#Chạy Serving Layer với Docker
 1️. Khởi động hạ tầng (Infrastructure)
 Trước khi chạy code xử lý, cần bật Elasticsearch, Kibana và Kafka:
 
@@ -96,3 +96,4 @@ curl http://elasticsearch:9200
 
 # Chạy job thủ công
 python3 src/serving_layer.py
+
