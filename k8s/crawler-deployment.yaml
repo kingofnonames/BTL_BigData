@@ -28,9 +28,9 @@ spec:
       volumes:
         - name: data-volume
           hostPath:
-            path: /home/anh/Documents/Big_Data/BTL_BigData/crawler/data
+            path: /crawler/data
             type: DirectoryOrCreate
         - name: logs-volume
           hostPath:
-            path: /home/anh/Documents/Big_Data/BTL_BigData/crawler/logs
+            path: /crawler/logs
             type: DirectoryOrCreate
