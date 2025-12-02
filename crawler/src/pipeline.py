@@ -255,10 +255,7 @@ class StockDataPipeline:
                 self.logger.info(f"Tổng dung lượng: {total_size:.2f} KB ({total_size/1024:.2f} MB)")
 
 def main():
-    # Tạo pipeline với danh sách mã từ config
     pipeline = StockDataPipeline()
-    
-    # Chạy toàn bộ
     pipeline.run(
         crawl_ohlcv=True,
         crawl_fundamental=True,
