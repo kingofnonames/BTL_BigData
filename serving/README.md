@@ -1,7 +1,7 @@
-Serving Layer – Xử lý & Trực quan hóa dữ liệu chứng khoán
+# Serving Layer – Xử lý & Trực quan hóa dữ liệu chứng khoán
 Serving Layer đảm nhận việc xử lý dữ liệu (Batch & Real-time) bằng Spark, lưu trữ tập trung tại Elasticsearch và trực quan hóa dữ liệu lên Dashboard Kibana.
 
-Giới thiệu
+# Giới thiệu
 Module sử dụng bộ công nghệ ELK Stack kết hợp với Spark để phục vụ dữ liệu:
 
 Batch Processing: Đọc dữ liệu lịch sử (OHLCV, Fundamental) từ file, chuẩn hóa và Index vào Elasticsearch.
@@ -12,7 +12,7 @@ Visualization: Cung cấp Dashboard Kibana để theo dõi biến động giá, 
 
 Module có thể chạy chế độ nạp dữ liệu lịch sử (Batch) hoặc lắng nghe thời gian thực (Streaming).
 
-Cấu trúc thư mục
+# Cấu trúc thư mục
 Plaintext
 
 serving/
@@ -23,7 +23,7 @@ serving/
 ├── requirements.txt
 └── src/                 # Source code Spark jobs
     └── __pycache__/
-#Hướng dẫn sử dụng
+# Hướng dẫn sử dụng
 1. Clone repository
 Bash
 
@@ -42,7 +42,7 @@ Bash
 pip install -r requirements.txt
 (Yêu cầu: Đã cài đặt Java JDK 11 để chạy Spark local)
 
-#Chạy Serving Layer với Docker
+# Chạy Serving Layer với Docker
 1️. Khởi động hạ tầng (Infrastructure)
 Trước khi chạy code xử lý, cần bật Elasticsearch, Kibana và Kafka:
 
@@ -96,4 +96,5 @@ curl http://elasticsearch:9200
 
 # Chạy job thủ công
 python3 src/serving_layer.py
+
 
