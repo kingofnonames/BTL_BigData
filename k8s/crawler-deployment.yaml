@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: crawler-deployment
+  name: crawler
   labels:
     app: crawler
 spec:
@@ -20,6 +20,11 @@ spec:
           imagePullPolicy: Never
           workingDir: /app
           command: ["python3", "pipeline.py"]
+          env:
+            - name: KAFKA_BOOTSTRAP
+              value: "kafka:9092"
+            - name: KAFKA_TOPIC
+              value: "stock-raw"
           volumeMounts:
             - name: data-volume
               mountPath: /app/data
