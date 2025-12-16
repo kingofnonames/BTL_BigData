@@ -10,6 +10,7 @@ from historical_ohlcv_crawler import HistoricalOHLCVCrawler
 from fundamental_analyst_crawler import FundamentalCrawler
 from market_crawler import MarketCrawler
 from save import DataSaver
+from kafka_handler import KafkaHandler
 
 class StockDataPipeline:
     def __init__(self, symbols=None):
@@ -59,10 +60,14 @@ class StockDataPipeline:
                      end_date=Config.END_DATE,
                      interval=interval
                      )
-                     if data is not None:
-                          filename = f"{symbol}_{interval}_{datetime.now().strftime('%Y%m%d')}.csv"
-                          self.saver.save_csv(data, filename, subdirectory='ohlcv')
-                          time.sleep(Config.REQUEST_DELAY)
+                    #  if data is not None:
+                    #       filename = f"{symbol}_{interval}_{datetime.now().strftime('%Y%m%d')}.csv"
+                    #       self.saver.save_csv(data, filename, subdirectory='ohlcv')
+                    #       time.sleep(Config.REQUEST_DELAY)
+                if data is not None:
+                    filename = f"{symbol}_{interval}_{datetime.now().strftime('%Y%m%d')}.parquet"
+                    self.saver.save_parquet(data, filename, subdirectory='ohlcv')
+                    self.kafka_handler.send(f"ohlcv_{symbol.lower()}", data)
                 else: 
                     data = crawler.get_historical_data(
                         start_date=CrawlerConfig.OHLCV['start_date'],
@@ -102,9 +107,13 @@ class StockDataPipeline:
             # Thông tin công ty
             if CrawlerConfig.FUNDAMENTAL['include_profile']:
                 profile = crawler.get_company_profile()
+                # if profile is not None:
+                #     filename = f"{symbol}_profile_{datetime.now().strftime('%Y%m%d')}.csv"
+                #     self.saver.save_csv(profile, filename, subdirectory='fundamental')
                 if profile is not None:
-                    filename = f"{symbol}_profile_{datetime.now().strftime('%Y%m%d')}.csv"
-                    self.saver.save_csv(profile, filename, subdirectory='fundamental')
+                    filename = f"{symbol}_profile_{datetime.now().strftime('%Y%m%d')}.parquet"
+                    self.saver.save_parquet(profile, filename, subdirectory='fundamental')
+                    self.kafka_handler.send(f"fundamental_{symbol.lower()}", profile)
                 time.sleep(Config.REQUEST_DELAY)
             
             # Báo cáo tài chính
