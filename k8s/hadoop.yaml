@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: namenode
+spec:
+  selector:
+    app: namenode
+  ports:
+    - protocol: TCP
+      port: 9870
+      targetPort: 9870
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: namenode
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: namenode
+    template:
+      metadata:
+        labels:
+          app: namenode
+      spec:
+        containers:
+        - name: namenode
+          image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+          imagePullPolicy: IfNotPresent
+          ports:
+          - containerPort: 9870
+          - containerPort: 9000
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: datanode
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: datanode
+  template:
+    metadata:
+      labels:
+        app: datanode
+    spec:
+      containers:
+      - name: datanode
+        image: bde2020/hadoop-datanode:2.0.0-hadoop3.2.1-java8
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9864

@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: crawler
-  labels:
-    app: crawler
 spec:
   replicas: 1
   selector:
@@ -16,20 +14,19 @@ spec:
     spec:
       containers:
         - name: crawler
-          image: bigdata/crawler:latest
-          imagePullPolicy: Never
+          image: nonamesak57/crawler:v2
+          imagePullPolicy: IfNotPresent
           workingDir: /app
-          command: ["python3", "pipeline.py"]
-          env:
-            - name: KAFKA_BOOTSTRAP
-              value: "kafka:9092"
-            - name: KAFKA_TOPIC
-              value: "stock-raw"
           volumeMounts:
             - name: data-volume
               mountPath: /app/data
             - name: logs-volume
               mountPath: /app/logs
+          env:
+            - name: KAFKA_BOOTSTRAP
+              value: "kafka:9092"
+            - name: KAFKA_TOPIC
+              value: "stock-raw"
       volumes:
         - name: data-volume
           hostPath:
