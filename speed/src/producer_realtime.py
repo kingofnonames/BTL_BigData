@@ -4,159 +4,172 @@ import logging
 from datetime import datetime, date
 import pandas as pd
 
-# --- IMPORT MỚI CHO VNSTOCK V3 ---
-# Thay vì import price_board, ta import class Vnstock
+# --- IMPORT KAFKA ---
+try:
+    from kafka import KafkaProducer
+    KAFKA_AVAILABLE = True
+except ImportError:
+    print("  Chưa cài thư viện kafka-python. Dữ liệu sẽ chỉ in ra màn hình.")
+    print("  Chạy lệnh: pip install kafka-python")
+    KAFKA_AVAILABLE = False
+
+# --- IMPORT VNSTOCK V3 ---
 try:
     from vnstock import Vnstock
 except ImportError:
-    print("Lỗi: Chưa cài đặt thư viện vnstock hoặc phiên bản không đúng.")
-    print("Vui lòng chạy: pip install vnstock --upgrade")
+    print(" Lỗi: Chưa cài đặt thư viện vnstock.")
     exit()
 
-# CẤU HÌNH
-# Danh sách mã cổ phiếu cần theo dõi (Ví dụ: VN30)
+# ================= CẤU HÌNH HỆ THỐNG =================
+# 1. Cấu hình Kafka
+KAFKA_BOOTSTRAP_SERVERS = ['localhost:9092'] # Đổi IP nếu chạy server khác
+KAFKA_TOPIC = 'stock_realtime_data'
+
+# 2. Danh sách cổ phiếu (VN30)
 SYMBOLS = [
     "ACB", "BCM", "BID", "BVH", "CTG", "FPT", "GAS", "GVR", "HDB", "HPG",
     "MBB", "MSN", "MWG", "PLX", "POW", "SAB", "SHB", "SSB", "SSI", "STB",
     "TCB", "TPB", "VCB", "VHM", "VIB", "VIC", "VJC", "VNM", "VPB", "VRE"
 ]
 
-# Chu kỳ lấy dữ liệu (giây) - Nên để > 5s để tránh bị chặn IP
+# 3. Chu kỳ lấy dữ liệu (giây)
 SLEEP_TIME = 15 
 
-# Thiết lập logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+# 4. Logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s | %(levelname)s | %(message)s')
 logger = logging.getLogger(__name__)
 
-def get_market_data(symbols_list):
-    """
-    Hàm lấy dữ liệu realtime sử dụng Vnstock v3
-    Nguồn: VCI (Vietcap)
-    Cơ chế: Lấy từng mã (Iterative) do API VCI/Vnstock validation chặn batch string.
-    """
-    all_dfs = []
-    
-    # Duyệt qua từng mã để lấy dữ liệu (An toàn nhất để tránh lỗi Invalid Symbol)
-    for symbol in symbols_list:
-        symbol = symbol.strip().upper()
-        try:
-            # Khởi tạo đối tượng Vnstock với nguồn VCI cho từng mã riêng biệt
-            stock_obj = Vnstock().stock(symbol=symbol, source='VCI')
-            
-            df_one = None
-            
-            # --- CƠ CHẾ TỰ ĐỘNG TÌM HÀM LẤY GIÁ (UPDATED) ---
-            # Dựa trên log debug: ['history', 'intraday', 'price_depth', ...]
-            
-            # Ưu tiên 1: 'intraday' - Lấy dữ liệu khớp lệnh trong ngày
-            if hasattr(stock_obj.quote, 'intraday'):
-                try:
-                    # Lấy dữ liệu intraday
-                    df_temp = stock_obj.quote.intraday()
-                    if df_temp is not None and not df_temp.empty:
-                        # Chỉ lấy dòng cuối cùng (giá mới nhất hiện tại)
-                        df_one = df_temp.tail(1).copy()
-                        # Đảm bảo có cột ticker để định danh
-                        if 'ticker' not in df_one.columns:
-                            df_one['ticker'] = symbol
-                except Exception as e_intra:
-                    logger.warning(f"Lỗi gọi intraday cho {symbol}: {e_intra}")
-
-            # Ưu tiên 2: 'price_depth' - Độ sâu giá (nếu intraday lỗi)
-            if df_one is None and hasattr(stock_obj.quote, 'price_depth'):
-                try:
-                    df_one = stock_obj.quote.price_depth()
-                except:
-                    pass
-
-            # Ưu tiên 3: Các hàm cũ (price, snapshot) để backup
-            if df_one is None:
-                if hasattr(stock_obj.quote, 'price'):
-                    df_one = stock_obj.quote.price()
-                elif hasattr(stock_obj.quote, 'snapshot'):
-                    df_one = stock_obj.quote.snapshot()
-            
-            # Nếu vẫn không tìm thấy hàm nào phù hợp
-            if df_one is None and symbol == symbols_list[0]:
-                 attrs = [d for d in dir(stock_obj.quote) if not d.startswith('__')]
-                 logger.error(f"DEBUG: Không lấy được data. Các hàm có sẵn: {attrs}")
-
-            # Kiểm tra và gom dữ liệu
-            if df_one is not None and not df_one.empty:
-                all_dfs.append(df_one)
-            
-            # Nghỉ cực ngắn để tránh spam request liên tục gây overload cục bộ
-            time.sleep(0.05)
-            
-        except Exception as e:
-            logger.error(f"Lỗi khi lấy mã {symbol}: {e}")
-            continue
-
-    # Gộp tất cả dataframe đơn lẻ thành 1 bảng lớn
-    if all_dfs:
-        try:
-            final_df = pd.concat(all_dfs, ignore_index=True)
-            return final_df
-        except Exception as e:
-            logger.error(f"Lỗi khi gộp dữ liệu: {e}")
-            return None
-    else:
-        logger.warning("Không lấy được dữ liệu nào từ danh sách.")
-        return None
+# ================= HÀM XỬ LÝ =================
 
 def json_serializer(data):
     """
-    Helper để convert object sang JSON string.
-    Thêm default=str để xử lý các object Date/Timestamp của Pandas/Python
+    Chuyển đổi dữ liệu sang JSON để gửi vào Kafka.
+    Sử dụng default=str để xử lý các kiểu dữ liệu ngày tháng của Pandas.
     """
     return json.dumps(data, default=str).encode('utf-8')
 
-def run_producer():
-    logger.info("Bắt đầu chạy Producer Realtime (Vnstock v3 - Source: VCI)...")
+def get_market_data(symbols_list):
+    """
+    Hàm lấy dữ liệu realtime sử dụng Vnstock v3 (Nguồn VCI)
+    """
+    all_dfs = []
     
+    # Lấy tuần tự từng mã để tránh lỗi API
+    for symbol in symbols_list:
+        symbol = symbol.strip().upper()
+        try:
+            stock_obj = Vnstock().stock(symbol=symbol, source='VCI')
+            df_one = None
+            
+            # Ưu tiên lấy intraday (khớp lệnh)
+            if hasattr(stock_obj.quote, 'intraday'):
+                try:
+                    df_temp = stock_obj.quote.intraday()
+                    if df_temp is not None and not df_temp.empty:
+                        df_one = df_temp.tail(1).copy() # Lấy dòng mới nhất
+                        if 'ticker' not in df_one.columns:
+                            df_one['ticker'] = symbol
+                except: pass
+
+            # Fallback sang các hàm khác
+            if df_one is None:
+                if hasattr(stock_obj.quote, 'price_depth'):
+                    try: df_one = stock_obj.quote.price_depth()
+                    except: pass
+                elif hasattr(stock_obj.quote, 'price'):
+                    try: df_one = stock_obj.quote.price()
+                    except: pass
+                elif hasattr(stock_obj.quote, 'snapshot'):
+                    try: df_one = stock_obj.quote.snapshot()
+                    except: pass
+
+            if df_one is not None and not df_one.empty:
+                all_dfs.append(df_one)
+            
+            time.sleep(0.05) # Nghỉ cực ngắn
+            
+        except Exception as e:
+            logger.error(f"Lỗi lấy mã {symbol}: {e}")
+            continue
+
+    if all_dfs:
+        try:
+            return pd.concat(all_dfs, ignore_index=True)
+        except: return None
+    return None
+
+def run_producer():
+    # --- 1. KHỞI TẠO KAFKA PRODUCER ---
+    producer = None
+    if KAFKA_AVAILABLE:
+        try:
+            producer = KafkaProducer(
+                bootstrap_servers=KAFKA_BOOTSTRAP_SERVERS,
+                value_serializer=json_serializer, # Tự động nén JSON
+                request_timeout_ms=5000
+            )
+            logger.info(f" Đã kết nối thành công tới Kafka: {KAFKA_BOOTSTRAP_SERVERS}")
+        except Exception as e:
+            logger.error(f" Không thể kết nối Kafka: {e}")
+            logger.warning("-> Chạy ở chế độ DRY-RUN (chỉ in ra màn hình, không gửi data).")
+
+    logger.info("🚀 Bắt đầu luồng dữ liệu chứng khoán...")
+    
+    # --- 2. VÒNG LẶP CHÍNH ---
     while True:
         try:
             start_time = time.time()
             
-            # 1. Lấy dữ liệu
+            # A. Lấy dữ liệu
             df = get_market_data(SYMBOLS)
             
             if df is not None and not df.empty:
-                # 2. Xử lý dữ liệu
-                # Convert DataFrame sang list of dicts để gửi đi
                 records = df.to_dict(orient='records')
+                count = 0
                 
-                logger.info(f"Đã lấy thành công {len(records)} bản ghi.")
-                
-                # 3. Gửi dữ liệu (MÔ PHỎNG)
+                # B. Gửi dữ liệu
                 for record in records:
-                    # --- KAFKA PRODUCER CODE ---
-                    # producer.send('stock-topic', value=record)
-                    pass
-                
-                # Hiển thị mẫu 1 dòng dữ liệu để kiểm tra
-                if records:
-                    # Tìm key chứa mã chứng khoán (thường là 'ticker', 'symbol' hoặc 'code')
-                    first_record = records[0]
-                    ticker_key = next((k for k in first_record.keys() if k.lower() in ['ticker', 'symbol', 'code']), None)
-                    ticker_val = first_record.get(ticker_key, 'N/A') if ticker_key else 'N/A'
+                    # Thêm timestamp thời gian gửi để tiện đo độ trễ
+                    record['ingestion_time'] = datetime.now().isoformat()
                     
-                    print(f"Sample Data ({datetime.now().strftime('%H:%M:%S')}): {ticker_val} - {first_record}")
+                    if producer:
+                        # Gửi vào Kafka Topic
+                        producer.send(KAFKA_TOPIC, value=record)
+                        count += 1
+                    else:
+                        # Nếu không có Kafka thì thôi (hoặc print debug nếu muốn)
+                        pass
+                
+                # Quan trọng: Đẩy dữ liệu đi ngay
+                if producer:
+                    producer.flush()
+                
+                logger.info(f"Đã xử lý {len(records)} mã. Gửi thành công {count} bản ghi vào topic '{KAFKA_TOPIC}'.")
+                
+                # In mẫu 1 dòng để kiểm tra
+                if records:
+                    sample = records[0]
+                    ticker = sample.get('ticker', 'UNKNOWN')
+                    print(f"   -> Sample: {ticker} | Price: {sample.get('price', 'N/A')} | Time: {sample.get('time', 'N/A')}")
 
-            # 4. Nghỉ (Rate limit)
-            # Tính toán thời gian thực thi để sleep chính xác
+            else:
+                logger.warning("Không lấy được dữ liệu nào trong phiên này.")
+
+            # C. Rate Limit
             elapsed_time = time.time() - start_time
             sleep_duration = max(0, SLEEP_TIME - elapsed_time)
             
-            logger.info(f"Đang chờ {sleep_duration:.2f}s cho lần lấy tiếp theo...")
-            time.sleep(sleep_duration)
+            if sleep_duration > 0:
+                logger.info(f"Đợi {sleep_duration:.1f}s...")
+                time.sleep(sleep_duration)
 
         except KeyboardInterrupt:
-            logger.info("Đã dừng Producer.")
+            logger.info(" Đã dừng chương trình thủ công.")
+            if producer: producer.close()
             break
         except Exception as e:
-            logger.error(f"Lỗi không mong muốn trong vòng lặp chính: {e}")
-            time.sleep(5) # Nghỉ ngắn nếu lỗi hệ thống
+            logger.error(f" Lỗi vòng lặp chính: {e}")
+            time.sleep(5)
 
 if __name__ == "__main__":
     run_producer()
