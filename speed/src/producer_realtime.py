@@ -1,7 +1,7 @@
 import time
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, date
 import pandas as pd
 
 # --- IMPORT MỚI CHO VNSTOCK V3 ---
@@ -105,8 +105,11 @@ def get_market_data(symbols_list):
         return None
 
 def json_serializer(data):
-    """Helper để convert object sang JSON string"""
-    return json.dumps(data).encode('utf-8')
+    """
+    Helper để convert object sang JSON string.
+    Thêm default=str để xử lý các object Date/Timestamp của Pandas/Python
+    """
+    return json.dumps(data, default=str).encode('utf-8')
 
 def run_producer():
     logger.info("Bắt đầu chạy Producer Realtime (Vnstock v3 - Source: VCI)...")
