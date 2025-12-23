@@ -11,7 +11,7 @@ logger = logging.getLogger("OHLCV-MapReduce-Incremental")
 
 HDFS_PATH = os.getenv("HDFS_PATH", "hdfs://namenode:8020/data/ohlcv")
 ES_HOST = os.getenv("ES_HOST", "http://elasticsearch:9200")
-ES_INDEX = os.getenv("ES_INDEX", "ohlcv_analysis")
+ES_INDEX = os.getenv("ES_INDEX_BATCH_OHLCV_ANAYLYST", "ohlcv_analysis")
 
 spark = SparkSession.builder.appName("OHLCV-MapReduce-Incremental").getOrCreate()
 logger.info(f"{datetime.now()} - Spark session started.")

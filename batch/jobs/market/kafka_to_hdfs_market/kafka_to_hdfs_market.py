@@ -3,8 +3,8 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json, to_date
 from pyspark.sql.types import *
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "kafka:9092")
-TOPIC = os.getenv("KAFKA_TOPIC", "stock.market.raw")
-HDFS_PATH = os.getenv("HDFS_PATH", "hdfs://namenode:8020/data/market")
+TOPIC = os.getenv("KAFKA_TOPIC_BATCH_MARKET", "stock.market.raw")
+HDFS_PATH = os.getenv("HDFS_PATH_MARKET", "hdfs://namenode:8020/data/market")
 PARTITION_COLS = ["index_code", "trade_date"]
 
 

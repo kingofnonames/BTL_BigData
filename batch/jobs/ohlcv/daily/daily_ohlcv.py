@@ -5,7 +5,7 @@ from pyspark.sql.types import LongType, TimestampType, DateType
 
 HDFS_PATH = os.getenv("HDFS_PATH", "hdfs://namenode:8020/data/ohlcv")
 ES_HOST = os.getenv("ES_HOST", "http://elasticsearch:9200")
-ES_INDEX = os.getenv("ES_INDEX", "ohlcv_daily_v2")
+ES_INDEX = os.getenv("ES_INDEX_BATCH_OHLCV_DAILY", "ohlcv_daily_v2")
 
 spark = SparkSession.builder.appName("OHLCV-Daily").getOrCreate()
 

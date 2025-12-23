@@ -4,7 +4,7 @@ from pyspark.sql.functions import col, from_json, to_date
 from pyspark.sql.types import *
 
 KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "kafka:9092")
-TOPIC = os.getenv("KAFKA_TOPIC", "stock.ohlcv.raw")
+TOPIC = os.getenv("KAFKA_TOPIC_BATCH_OHLCV", "stock.ohlcv.raw")
 HDFS_PATH = os.getenv("HDFS_PATH", "hdfs://namenode:8020/data/ohlcv")
 PARTITION_COLS = os.getenv("PARTITION_COLS", "symbol,interval,trade_date").split(",")
 

@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlib-evaluate
+  namespace: bigdata
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlib-evaluate
+  template:
+    metadata:
+      labels:
+        app: mlib-evaluate
+    spec:
+      containers:
+        - name: mlib-evaluate
+          image: mlib_evaluate:latest
+          envFrom:
+            - configMapRef:
+                name: bigdata-config
+            - secretRef:
+                name: airflow-secret
+          resources:
+            limits:
+              memory: "1Gi"
+              cpu: "1"

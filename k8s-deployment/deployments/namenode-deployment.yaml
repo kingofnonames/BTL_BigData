@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: namenode
+  namespace: bigdata
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: namenode
+  template:
+    metadata:
+      labels:
+        app: namenode
+    spec:
+      containers:
+        - name: namenode
+          image: bde2020/hadoop-namenode:2.0.0-hadoop3.2.1-java8
+          env:
+            - name: CLUSTER_NAME
+              value: "lambda-cluster"
+          ports:
+            - containerPort: 8020
+            - containerPort: 9870
+          volumeMounts:
+            - name: namenode-data
+              mountPath: /hadoop/dfs/name
+      volumes:
+        - name: namenode-data
+          hostPath:
+            path: ./volumes/hdfs/namenode

@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: speed-crawler-job
+  namespace: bigdata
+spec:
+  template:
+    metadata:
+      labels:
+        app: speed-crawler
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: speed-crawler
+          image: speed_crawler:latest
+          envFrom:
+            - configMapRef:
+                name: bigdata-config
+            - secretRef:
+                name: airflow-secret
+          command: ["python", "/opt/app/main.py"]
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "0.5"
