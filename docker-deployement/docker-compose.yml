@@ -119,10 +119,13 @@ services:
     image: docker.elastic.co/kibana/kibana:8.11.0
     container_name: kibana
     networks: [bigdata-net]
+    environment:
+      - NODE_OPTIONS=--max-old-space-size=4096
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
     depends_on: [elasticsearch]
     ports:
       - "5601:5601"
-    mem_limit: 256m
+    mem_limit: 1g
     cpus: 0.3
 
   # =====================
@@ -178,3 +181,81 @@ services:
     command: scheduler
     mem_limit: 512m
     cpus: 0.4
+
+  # =====================
+  # REDIS (SERVING LAYER)
+  # =====================
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    networks: [bigdata-net]
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - ./data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    mem_limit: 256m
+    cpus: 0.3
+
+  # =====================
+  # SERVING API
+  # =====================
+  serving-api:
+    build:
+      context: ./serving
+      dockerfile: Dockerfile
+    container_name: serving-api
+    networks: [bigdata-net]
+    depends_on:
+      - redis
+      - elasticsearch
+    ports:
+      - "8000:8000"
+    environment:
+      # API Config
+      API_PORT: 8000
+      DEBUG: "false"
+      LOG_LEVEL: INFO
+      
+      # Elasticsearch - Batch Layer
+      ES_HOST: http://elasticsearch:9200
+      ES_INDEX_OHLCV: ohlcv_daily_v2
+      ES_INDEX_ANALYSIS: ohlcv_analysis
+      ES_INDEX_MARKET: market_daily_v2
+      ES_INDEX_MARKET_ANALYSIS: market_analysis
+      
+      # Elasticsearch - Speed Layer
+      ES_INDEX_OHLCV_SPEED: ohlcv_daily_v2_speed
+      ES_INDEX_ANALYSIS_SPEED: ohlcv_analysis_speed
+      ES_INDEX_MARKET_SPEED: market_daily_speed
+      ES_INDEX_MARKET_ANALYSIS_SPEED: market_analysis_speed
+      
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      
+      # Cache TTL (seconds)
+      CACHE_TTL_LATEST: 60
+      CACHE_TTL_HISTORICAL: 3600
+      CACHE_TTL_INDICATORS: 300
+      CACHE_TTL_MARKET: 60
+      CACHE_TTL_MARKET_INDICATORS: 300
+      
+      # Speed Layer (set to true when ready)
+      ENABLE_SPEED_LAYER: "false"
+      KAFKA_BOOTSTRAP: kafka:9092
+      
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/health/ping || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    mem_limit: 512m
+    cpus: 0.5
+    restart: unless-stopped

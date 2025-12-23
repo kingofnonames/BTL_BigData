@@ -1,0 +1,272 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: serving-api-config
+data:
+  # API Config
+  API_PORT: "8000"
+  DEBUG: "false"
+  LOG_LEVEL: "INFO"
+  
+  # Elasticsearch - Batch Layer
+  ES_HOST: "http://elasticsearch:9200"
+  ES_INDEX_OHLCV: "ohlcv_daily_v2"
+  ES_INDEX_ANALYSIS: "ohlcv_analysis"
+  ES_INDEX_MARKET: "market_daily_v2"
+  ES_INDEX_MARKET_ANALYSIS: "market_analysis"
+  
+  # Elasticsearch - Speed Layer
+  ES_INDEX_OHLCV_SPEED: "ohlcv_daily_v2_speed"
+  ES_INDEX_ANALYSIS_SPEED: "ohlcv_analysis_speed"
+  ES_INDEX_MARKET_SPEED: "market_daily_speed"
+  ES_INDEX_MARKET_ANALYSIS_SPEED: "market_analysis_speed"
+  
+  # Redis
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  
+  # Cache TTL (seconds)
+  CACHE_TTL_LATEST: "60"
+  CACHE_TTL_HISTORICAL: "3600"
+  CACHE_TTL_INDICATORS: "300"
+  CACHE_TTL_MARKET: "60"
+  CACHE_TTL_MARKET_INDICATORS: "300"
+  
+  # Speed Layer (set to true when ready)
+  ENABLE_SPEED_LAYER: "false"
+  
+  # Kafka
+  KAFKA_BOOTSTRAP: "kafka:9092"
+  
+  # Business Logic
+  DEFAULT_SYMBOLS: "FPT,VNM,VCB"
+  MAX_RESULTS_PER_QUERY: "1000"
+  DEFAULT_PAGE_SIZE: "50"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    app: redis
+    component: cache
+spec:
+  selector:
+    app: redis
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+      name: redis
+  type: ClusterIP
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  labels:
+    app: redis
+    component: cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+        component: cache
+    spec:
+      containers:
+      - name: redis
+        image: redis:7-alpine
+        ports:
+        - containerPort: 6379
+          name: redis
+        command:
+          - redis-server
+          - --appendonly
+          - "yes"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "300m"
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+        livenessProbe:
+          exec:
+            command:
+              - redis-cli
+              - ping
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+        readinessProbe:
+          exec:
+            command:
+              - redis-cli
+              - ping
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      volumes:
+      - name: redis-data
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: serving-api
+  labels:
+    app: serving-api
+    component: api
+spec:
+  selector:
+    app: serving-api
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30800
+      name: http
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: serving-api
+  labels:
+    app: serving-api
+    component: api
+    version: v1.1.0
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: serving-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: serving-api
+        component: api
+        version: v1.1.0
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: serving-api
+        image: nonamesak57/serving-api:v1.1.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+          protocol: TCP
+        envFrom:
+        - configMapRef:
+            name: serving-api-config
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/v1/health/ping
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/v1/health
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        startupProbe:
+          httpGet:
+            path: /api/v1/health/ping
+            port: 8000
+            scheme: HTTP
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          successThreshold: 1
+          failureThreshold: 12
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: serving-api-hpa
+  labels:
+    app: serving-api
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: serving-api
+  minReplicas: 2
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+      - type: Percent
+        value: 50
+        periodSeconds: 60
+      - type: Pods
+        value: 1
+        periodSeconds: 60
+      selectPolicy: Min
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+      - type: Percent
+        value: 100
+        periodSeconds: 30
+      - type: Pods
+        value: 2
+        periodSeconds: 30
+      selectPolicy: Max
