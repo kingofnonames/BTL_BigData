@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: crawler-job
+  namespace: bigdata
+spec:
+  template:
+    metadata:
+      labels:
+        app: crawler-job
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: crawler
+          image: crawler:latest
+          envFrom:
+            - configMapRef:
+                name: bigdata-config.yaml
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "0.5"
