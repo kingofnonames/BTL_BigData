@@ -7,14 +7,10 @@ from pyspark.ml.regression import LinearRegression, RandomForestRegressor
 from pyspark.ml import Pipeline
 from pyspark.ml.evaluation import RegressionEvaluator
 
-# --- Spark session ---
 spark = SparkSession.builder.appName("OHLCV-FPT-Predict").getOrCreate()
-
-# --- Environment variables ---
 HDFS_PATH = os.getenv("HDFS_PATH", "hdfs://namenode:8020/data/ohlcv")
 SYMBOL_DEFAULT = os.getenv("SYMBOL_DEFAULT", "FPT")
 
-# --- Load parquet ---
 df = spark.read.parquet(HDFS_PATH)
 if 'data' in df.columns:
     df_flat = df.select(
