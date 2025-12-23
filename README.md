@@ -169,50 +169,165 @@ docker-compose logs -f spark-master
 # - Kibana: http://localhost:5601
 ```
 
-### Option 2: Chạy trên Kubernetes (Production)
+### Option 2: Chạy trên Kubernetes với Minikube
+
+#### **Yêu cầu hệ thống:**
+- ✅ Minikube đã cài và đang chạy
+- ✅ Docker Desktop hoặc Docker daemon đang chạy
+- ✅ kubectl CLI đã cấu hình
+
+#### **Bước 1: Chuẩn bị môi trường**
 
 ```bash
-# Chuẩn bị K8s cluster
+# Khởi động Minikube (nếu chưa chạy)
+minikube start
+
+# Kiểm tra trạng thái
+minikube status
 kubectl cluster-info
 
-# Deploy toàn bộ hệ thống
+# Tạo thư mục dữ liệu (trên máy host)
+mkdir -p ./data/hdfs/namenode
+mkdir -p ./data/hdfs/datanode
+mkdir -p ./data/elasticsearch
+mkdir -p ./airflow/dags
+mkdir -p ./airflow/logs
+```
+
+#### **Bước 2: Build Docker Images trong Minikube**
+
+```bash
+# Sử dụng Docker daemon của Minikube
+eval $(minikube -p minikube docker-env)
+
+# Build các images (từ thư mục gốc dự án)
+cd BTL_BigData
+
+# Batch Layer Jobs
+docker build -t analyst_ohlcv:latest ./batch/jobs/ohlcv/analyst
+docker build -t daily_ohlcv:latest ./batch/jobs/ohlcv/daily
+docker build -t kafka_to_hdfs_ohlcv:latest ./batch/jobs/ohlcv/kafka_to_hdfs_ohlcv
+docker build -t kafka_to_hdfs_market:latest ./batch/jobs/market/kafka_to_hdfs_market
+docker build -t mlib_evaluate:latest ./batch/jobs/ohlcv/mlib_evaluate
+
+# Crawler
+docker build -t crawler:latest ./batch/crawler_batch
+
+# Speed Layer
+docker build -t ohlcv_speed:latest ./speed/ohlcv
+docker build -t speed_crawler:latest ./speed/crawler_speed
+
+# Kiểm tra images đã build
+docker images | grep -E "analyst_ohlcv|daily_ohlcv|kafka_to_hdfs|mlib|crawler|speed"
+```
+
+#### **Bước 3: Deploy lên Kubernetes**
+
+```bash
 cd k8s-deployment
 
-# 1. Tạo namespace và config
+# 1. Tạo namespace
 kubectl apply -f namespace.yaml
-kubectl apply -f configmap/
-kubectl apply -f secrets/
 
-# 2. Deploy infrastructure
+# 2. Apply ConfigMap và Secret
+kubectl apply -f configmap/bigdata-config.yaml
+kubectl apply -f configmap/kafka-config.yaml
+kubectl apply -f secrets/airflow-secret.yaml
+
+# 3. Deploy Services (trước để pod có thể kết nối)
+kubectl apply -f services/
+
+# 4. Deploy Infrastructure (theo thứ tự phụ thuộc)
+# Zookeeper trước
 kubectl apply -f deployments/zookeeper-deployment.yaml
-kubectl apply -f services/zookeeper-service.yaml
+kubectl wait --for=condition=ready pod -l app=zookeeper -n bigdata --timeout=120s
+
+# Kafka sau Zookeeper
 kubectl apply -f deployments/kafka-deployment.yaml
-kubectl apply -f services/kafka-service.yaml
+
+# HDFS
 kubectl apply -f deployments/namenode-deployment.yaml
-kubectl apply -f services/namenode-service.yaml
 kubectl apply -f deployments/datanode-deployment.yaml
+
+# Elasticsearch
 kubectl apply -f deployments/elasticsearch-deployment.yaml
-kubectl apply -f services/elasticsearch-service.yaml
+
+# Spark
 kubectl apply -f deployments/spark-master-deployment.yaml
-kubectl apply -f services/spark-master-service.yaml
 kubectl apply -f deployments/spark-worker-deployment.yaml
 
-# 3. Deploy batch layer
+# Airflow (optional)
+kubectl apply -f deployments/airflow-db-deployment.yaml
+
+# 5. Deploy Batch Layer
 kubectl apply -f deployments/crawler-deployment.yaml
 kubectl apply -f deployments/kafka-to-hdfs-ohlcv-deployment.yaml
 kubectl apply -f deployments/kafka-to-hdfs-market-deployment.yaml
 kubectl apply -f deployments/daily-ohlcv-deployment.yaml
 kubectl apply -f deployments/analyst-ohlcv-deployment.yaml
 
-# 4. Deploy speed layer
+# 6. Deploy Speed Layer
 kubectl apply -f deployments/speed-crawler-deployment.yaml
 kubectl apply -f deployments/ohlcv-speed-deployment.yaml
 
-# Kiểm tra pods
-kubectl get pods -n bigdata
+# 7. Deploy Jobs (batch jobs chạy 1 lần)
+kubectl apply -f jobs/
 
-# Xem logs
+# Kiểm tra trạng thái
+kubectl get pods -n bigdata
+kubectl get svc -n bigdata
+```
+
+#### **Bước 4: Truy cập Web UIs**
+
+```bash
+# Lấy Minikube IP
+minikube ip
+# Ví dụ output: 192.168.49.2
+
+# Truy cập các services:
+# - HDFS NameNode: http://<minikube-ip>:9870
+# - Spark Master: http://<minikube-ip>:8080
+# - Elasticsearch: http://<minikube-ip>:9200
+# - Kibana: http://<minikube-ip>:5601
+# - Airflow: http://<minikube-ip>:8080
+```
+
+#### **Bước 5: Chạy lại Jobs**
+
+```bash
+# Jobs chạy 1 lần và kết thúc
+# Để chạy lại job:
+kubectl delete job analyst-ohlcv-job -n bigdata
+kubectl apply -f jobs/ohlcv-analysis-job.yaml
+
+# Xem logs của job
+kubectl logs -f <job-pod-name> -n bigdata
+
+# List tất cả jobs
+kubectl get jobs -n bigdata
+```
+
+#### **Debug & Monitoring**
+
+```bash
+# Xem logs của pod
 kubectl logs -f <pod-name> -n bigdata
+
+# Describe pod để xem chi tiết
+kubectl describe pod <pod-name> -n bigdata
+
+# Exec vào pod
+kubectl exec -it <pod-name> -n bigdata -- /bin/bash
+
+# Xem events
+kubectl get events -n bigdata --sort-by='.lastTimestamp'
+
+# Sửa ConfigMap
+kubectl edit configmap bigdata-config -n bigdata
+
+# Restart deployment sau khi sửa config
+kubectl rollout restart deployment <deployment-name> -n bigdata
 ```
 
 ### Option 3: Chạy từng module riêng lẻ
