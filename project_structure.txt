@@ -2,8 +2,7 @@ BTL_BigData/
 │
 ├── airflow/
 │   └── dags/
-│       ├── batch_docker_dag.py
-│       └── batch_k8s_dag.py
+│       └── ohlcv_dags.py
 │
 ├── batch/
 │   ├── crawler_batch/
@@ -26,10 +25,24 @@ BTL_BigData/
 │       │
 │       └── ohlcv/
 │           ├── analyst/
-│           │   └── analyst_ohlcv.py
+│           │   ├── analyst_ohlcv.py
+│           │   ├── Dockerfile
+│           │   └── requirements.txt
+│           │
 │           ├── daily/
+│           │   ├── daily_ohlcv.py
+│           │   ├── Dockerfile
+│           │   └── requirements.txt
+│           │
 │           ├── kafka_to_hdfs_ohlcv/
+│           │   ├── Dockerfile
+│           │   ├── kafka_to_hdfs_ohlcv.py
+│           │   └── requirements.txt
+│           │
 │           └── mlib_evaluate/
+│               ├── Dockerfile
+│               ├── mlib_evaluate.py
+│               └── requirements.txt
 │
 ├── crawler/
 │   ├── Dockerfile
@@ -59,6 +72,7 @@ BTL_BigData/
 │   ├── deployments/
 │   │   ├── airflow-db-deployment.yaml
 │   │   ├── analyst-ohlcv-deployment.yaml
+│   │   ├── crawler-deployment.yaml
 │   │   ├── daily-ohlcv-deployment.yaml
 │   │   ├── datanode-deployment.yaml
 │   │   ├── elasticserach-deployment.yaml
@@ -74,6 +88,7 @@ BTL_BigData/
 │   │   └── zookeeper-deployment.yaml
 │   │
 │   ├── jobs/
+│   │   ├── crawler-job.yaml
 │   │   ├── daily-ohlcv-job.yaml
 │   │   ├── kafka-to-hdfs-market-job.yaml
 │   │   ├── kafka-to-hdfs-ohlcv-job.yaml
@@ -93,6 +108,8 @@ BTL_BigData/
 │       ├── namenode-service.yaml
 │       ├── spark-master-service.yaml
 │       └── zookeeper-service.yaml
+│
+├── pipe_line.png
 │
 └── speed/
     ├── crawler_speed/
