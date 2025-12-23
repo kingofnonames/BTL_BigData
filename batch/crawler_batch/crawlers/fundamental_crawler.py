@@ -1,32 +1,3 @@
-# from vnstock import Vnstock
-# from datetime import datetime, timezone
-
-# class FundamentalCrawler:
-#     def __init__(self, symbol: str, source: str):
-#         self.symbol = symbol
-#         self.source = source
-#         self.stock = Vnstock().stock(symbol=symbol, source=source)
-
-#     def crawl_profile(self):
-#         profile = self.stock.company.overview()
-#         if profile is None or profile.empty:
-#             return None
-
-#         record = profile.iloc[0].to_dict()
-#         now_utc = datetime.now(timezone.utc)
-
-#         event = {
-#             "event_type": "fundamental_profile",
-#             "symbol": self.symbol,
-#             "event_date": now_utc.date().isoformat(),
-#             "event_time": now_utc.isoformat(),
-#             "source": self.source,
-#             "data": record
-#         }
-
-#         return event
-
-
 from vnstock import Vnstock
 from datetime import datetime, timezone
 
