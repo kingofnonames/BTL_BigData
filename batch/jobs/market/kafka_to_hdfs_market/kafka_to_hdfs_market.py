@@ -52,5 +52,5 @@ df = df_raw.select(
     col("parsed.data.volume").alias("volume")
 )
 df = df.withColumn("trade_date", to_date(col("event_date")))
-df.write.mode("overwrite").partitionBy(*PARTITION_COLS).parquet(HDFS_PATH)
+df.write.mode("append").partitionBy(*PARTITION_COLS).parquet(HDFS_PATH)
 spark.stop()

@@ -12,12 +12,9 @@ USER spark
 
 COPY daily_ohlcv.py .
 
-ENTRYPOINT ["spark-submit",
-    "--master", "local[*]",
-    "--packages", "org.elasticsearch:elasticsearch-spark-30_2.12:8.11.0",
-    "--conf", "spark.jars.ivy=/tmp/.ivy2",
-    "--conf", "spark.executor.memory=1g",
-    "--conf", "spark.driver.memory=500m",
-    "--conf", "spark.sql.shuffle.partitions=2",
-    "daily_ohlcv.py"
-]
+ENTRYPOINT ["spark-submit", \
+    "--master", "spark://spark-master:7077", \
+    "--packages", "org.elasticsearch:elasticsearch-spark-30_2.12:8.11.0", \
+    "--conf", "spark.jars.ivy=/tmp/.ivy2", \
+    "daily_ohlcv.py"]
+

@@ -12,4 +12,9 @@ USER spark
 
 COPY mlib_evaluate.py .
 
-ENTRYPOINT ["spark-submit", "--master", "local[*]", "--packages", "org.elasticsearch:elasticsearch-spark-30_2.12:8.11.0", "--conf", "spark.jars.ivy=/tmp/.ivy2", "mlib_evaluate.py"]
+# ENTRYPOINT ["spark-submit", "--master", "local[*]", "--packages", "org.elasticsearch:elasticsearch-spark-30_2.12:8.11.0", "--conf", "spark.jars.ivy=/tmp/.ivy2", "mlib_evaluate.py"]
+ENTRYPOINT ["spark-submit", \
+    "--master", "spark://spark-master:7077", \
+    "--packages", "org.elasticsearch:elasticsearch-spark-30_2.12:8.11.0", \
+    "--conf", "spark.jars.ivy=/tmp/.ivy2", \
+    "mlib_evaluate.py"]
