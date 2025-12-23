@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: speed-crawler
+  namespace: bigdata
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: speed-crawler
+  template:
+    metadata:
+      labels:
+        app: speed-crawler
+    spec:
+      containers:
+        - name: speed-crawler
+          image: speed_crawler:latest
+          envFrom:
+            - configMapRef:
+                name: bigdata-config
+            - secretRef:
+                name: airflow-secret
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "0.5"

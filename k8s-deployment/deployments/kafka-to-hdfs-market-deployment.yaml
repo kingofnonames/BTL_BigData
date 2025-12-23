@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-to-hdfs-market
+  namespace: bigdata
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-to-hdfs-market
+  template:
+    metadata:
+      labels:
+        app: kafka-to-hdfs-market
+    spec:
+      containers:
+        - name: kafka-to-hdfs-market
+          image: kafka_to_hdfs_market:latest
+          envFrom:
+            - configMapRef:
+                name: bigdata-config
+            - secretRef:
+                name: airflow-secret
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "0.5"

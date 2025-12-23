@@ -8,9 +8,9 @@ class Config:
     
     # Danh sách mã cổ phiếu cần thu thập
     SYMBOLS = [
+        'VCB',   # Vietcombank
         'FPT',   # FPT Corporation
         'VNM',   # Vinamilk
-        'VCB',   # Vietcombank
         'HPG',   # Hòa Phát
         'VHM',   # Vinhomes
         'VIC',   # Vingroup
@@ -22,7 +22,7 @@ class Config:
     
     # Nguồn dữ liệu (VCI, TCBS, MSN)
     # Note: VCI có thể bị 403, thử dùng TCBS
-    DATA_SOURCE = 'TCBS'
+    DATA_SOURCE = 'VCI'
     
     # Cấu hình thời gian
     END_DATE = datetime.now().strftime('%Y-%m-%d')

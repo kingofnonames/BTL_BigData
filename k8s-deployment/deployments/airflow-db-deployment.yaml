@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: airflow-db
+  namespace: bigdata
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: airflow-db
+  template:
+    metadata:
+      labels:
+        app: airflow-db
+    spec:
+      containers:
+        - name: airflow-db
+          image: postgres:13
+          envFrom:
+            - secretRef:
+                name: airflow-secret
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: airflow-db-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: airflow-db-data
+          hostPath:
+            path: ./volumes/airflow-db

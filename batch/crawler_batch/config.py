@@ -18,9 +18,9 @@ class Config:
 
     KAFKA_BOOTSTRAP = os.getenv("KAFKA_BOOTSTRAP", "kafka:9092")
 
-    TOPIC_OHLCV_RAW = os.getenv("TOPIC_OHLCV_RAW", "stock.ohlcv.raw")
+    TOPIC_OHLCV_RAW = os.getenv("KAFKA_TOPIC_BATCH_OHLCV", "stock.ohlcv.raw")
     TOPIC_FUNDAMENTAL_RAW = os.getenv("TOPIC_FUNDAMENTAL_RAW", "stock.fundamental.raw")
-    TOPIC_MARKET_RAW = os.getenv("TOPIC_MARKET_RAW", "stock.market.raw")
+    TOPIC_MARKET_RAW = os.getenv("KAFKA_TOPIC_BATCH_MARKET", "stock.market.raw")
 
     REQUEST_DELAY = int(os.getenv("REQUEST_DELAY", 1))
 

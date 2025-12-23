@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bigdata-config
+  namespace: bigdata
+data:
+  HDFS_PATH: "hdfs://namenode:8020/data/ohlcv"
+  HDFS_PATH_MARKET: "hdfs://namenode:8020/data/market"
+  ES_HOST: "http://elasticsearch:9200"
+  ES_INDEX_BATCH_OHLCV_DAILY: "ohlcv_daily_v2"
+  ES_INDEX_BATCH_OHLCV_ANAYLYST: "ohlcv_analysis"
+  ES_INDEX_BATCH_MARKET: "market_data_v1"
+  ES_INDEX_SPEED_STOCK: "stock_intraday"
+  SPARK_MASTER: "spark://spark-master:7077"
+  KAFKA_BOOTSTRAP: "kafka:9092"
+  KAFKA_TOPIC_BATCH_OHLCV: "stock.ohlcv.raw"
+  KAFKA_TOPIC_BATCH_MARKET: "stock.market.raw"
+  KAFKA_TOPIC_SPEED_STOCK: "stock.market.speed.raw"
+  HDFS_PATH: "hdfs://namenode:8020/data/market"
+  KAFKA_BOOTSTRAP: "kafka:9092"
+  EMA_PERIOD: "5"
+  DATA_SOURCE: "VCI"
+  SYMBOLS: "FPT,VNM,VCB"
+  SYMBOL_DEFAULT: "FPT"
+  

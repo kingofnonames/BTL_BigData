@@ -98,20 +98,6 @@ class DataSaver:
             })
         
         return pd.DataFrame(info)
-    
-    def save_parquet(self, data, filename, subdirectory='raw'):
-        if data is None or data.empty:
-            print(f"No data to save for {filename}")
-            return False
-        try:
-            os.makedirs(os.path.join(self.base_dir, subdirectory), exist_ok=True)
-            filepath = os.path.join(self.base_dir, subdirectory, filename)
-            data.to_parquet(filepath, index=False)
-            print(f"✓ Saved: {filepath}")
-            return True
-        except Exception as e:
-            print(f"✗ Error saving file {filename}: {e}")
-            return False
 
 def main():
     """Demo sử dụng DataSaver"""

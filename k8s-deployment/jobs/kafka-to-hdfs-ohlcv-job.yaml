@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-to-hdfs-ohlcv
+  namespace: bigdata
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kafka-to-hdfs-ohlcv
+  template:
+    metadata:
+      labels:
+        app: kafka-to-hdfs-ohlcv
+    spec:
+      containers:
+        - name: kafka-to-hdfs-ohlcv
+          image: kafka_to_hdfs_ohlcv:latest
+          envFrom:
+            - configMapRef:
+                name: bigdata-config
+            - secretRef:
+                name: airflow-secret
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "0.5"

@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kafka-to-hdfs-market-job
+  namespace: bigdata
+spec:
+  template:
+    metadata:
+      labels:
+        app: kafka-to-hdfs-market
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: kafka-to-hdfs-market
+          image: kafka_to_hdfs_market:latest
+          envFrom:
+            - configMapRef:
+                name: bigdata-config
+            - secretRef:
+                name: airflow-secret
+          command:
+            - "spark-submit"
+            - "--master"
+            - "spark://spark-master:7077"
+            - "--packages"
+            - "org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.1"
+            - "--conf"
+            - "spark.jars.ivy=/tmp/.ivy2"
+            - "/opt/spark/jobs/kafka_to_hdfs_market.py"
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "0.5"

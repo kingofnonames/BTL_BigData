@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: ohlcv-analysis-job
+  namespace: bigdata
+spec:
+  template:
+    metadata:
+      labels:
+        app: ohlcv-analysis
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: ohlcv-analysis
+          image: analyst_ohlcv:latest
+          envFrom:
+            - configMapRef:
+                name: bigdata-config
+            - secretRef:
+                name: airflow-secret
+          command:
+            - "spark-submit"
+            - "--master"
+            - "spark://spark-master:7077"
+            - "--packages"
+            - "org.elasticsearch:elasticsearch-spark-30_2.12:8.11.0"
+            - "--conf"
+            - "spark.jars.ivy=/tmp/.ivy2"
+            - "/opt/spark/jobs/analyst_ohlcv.py"
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "0.5"

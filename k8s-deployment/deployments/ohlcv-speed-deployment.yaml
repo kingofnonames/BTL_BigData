@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ohlcv-speed
+  namespace: bigdata
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ohlcv-speed
+  template:
+    metadata:
+      labels:
+        app: ohlcv-speed
+    spec:
+      containers:
+        - name: ohlcv-speed
+          image: ohlcv_speed:latest
+          envFrom:
+            - configMapRef:
+                name: bigdata-config
+            - secretRef:
+                name: airflow-secret
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "0.5"

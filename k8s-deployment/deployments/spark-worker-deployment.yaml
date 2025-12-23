@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spark-worker
+  namespace: bigdata
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: spark-worker
+  template:
+    metadata:
+      labels:
+        app: spark-worker
+    spec:
+      containers:
+        - name: spark-worker
+          image: apache/spark:3.5.1
+          command: ["/bin/sh", "-c"]
+          args:
+            [
+              "/opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077",
+            ]
+          envFrom:
+            - configMapRef:
+                name: bigdata-config
+          resources:
+            limits:
+              memory: "1.5Gi"
+              cpu: "1"
