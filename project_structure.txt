@@ -1,0 +1,111 @@
+BTL_BigData/
+│
+├── airflow/
+│   └── dags/
+│       ├── batch_docker_dag.py
+│       └── batch_k8s_dag.py
+│
+├── batch/
+│   ├── crawler_batch/
+│   │   ├── config.py
+│   │   ├── Dockerfile
+│   │   ├── kafka_producer.py
+│   │   ├── main.py
+│   │   ├── requirements.txt
+│   │   └── crawlers/
+│   │       ├── fundamental_crawler.py
+│   │       ├── market_crawler.py
+│   │       └── ohlcv_crawler.py
+│   │
+│   └── jobs/
+│       ├── market/
+│       │   └── kafka_to_hdfs_market/
+│       │       ├── Dockerfile
+│       │       ├── kafka_to_hdfs_market.py
+│       │       └── requirements.txt
+│       │
+│       └── ohlcv/
+│           ├── analyst/
+│           │   └── analyst_ohlcv.py
+│           ├── daily/
+│           ├── kafka_to_hdfs_ohlcv/
+│           └── mlib_evaluate/
+│
+├── crawler/
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   └── src/
+│       ├── config.py
+│       ├── examples.py
+│       ├── fundamental_analyst_crawler.py
+│       ├── historical_ohlcv_crawler.py
+│       ├── kafka_handler.py
+│       ├── market_crawler.py
+│       ├── pipeline.py
+│       ├── quick_test.py
+│       ├── save.py
+│       └── test_crawlers.py
+│
+├── docker-deployment/
+│   └── docker-compose.yml
+│
+├── k8s-deployment/
+│   ├── namespace.yaml
+│   │
+│   ├── configmap/
+│   │   ├── bigdata-config.yaml
+│   │   └── kafka-config.yaml
+│   │
+│   ├── deployments/
+│   │   ├── airflow-db-deployment.yaml
+│   │   ├── analyst-ohlcv-deployment.yaml
+│   │   ├── daily-ohlcv-deployment.yaml
+│   │   ├── datanode-deployment.yaml
+│   │   ├── elasticserach-deployment.yaml
+│   │   ├── kafka-deployment.yaml
+│   │   ├── kafka-to-hdfs-market-deployment.yaml
+│   │   ├── kafka-to-hdfs-ohlcv-deployment.yaml
+│   │   ├── mlib-evaluate-deployment.yaml
+│   │   ├── namenode-deployment.yaml
+│   │   ├── ohlcv-speed-deployment.yaml
+│   │   ├── spark-master-deployment.yaml
+│   │   ├── spark-worker-deployment.yaml
+│   │   ├── speed-crawler-deployment.yaml
+│   │   └── zookeeper-deployment.yaml
+│   │
+│   ├── jobs/
+│   │   ├── daily-ohlcv-job.yaml
+│   │   ├── kafka-to-hdfs-market-job.yaml
+│   │   ├── kafka-to-hdfs-ohlcv-job.yaml
+│   │   ├── mlib-evaluate-job.yaml
+│   │   ├── ohlch-speed-job.yaml
+│   │   ├── ohlcv-analysis-job.yaml
+│   │   └── speed-crawler-job.yaml
+│   │
+│   ├── secrets/
+│   │   └── airflow-secret.yaml
+│   │
+│   └── services/
+│       ├── airflow-db-service.yaml
+│       ├── datanode-service.yaml
+│       ├── elasticsearch-service.yaml
+│       ├── kafka-service.yaml
+│       ├── namenode-service.yaml
+│       ├── spark-master-service.yaml
+│       └── zookeeper-service.yaml
+│
+└── speed/
+    ├── crawler_speed/
+    │   ├── config.py
+    │   ├── Dockerfile
+    │   ├── kafka_producer.py
+    │   ├── logging_config.py
+    │   ├── main.py
+    │   ├── market_crawler.py
+    │   ├── requirements.txt
+    │   └── speed_ingest.py
+    │
+    └── ohlcv/
+        ├── Dockerfile
+        ├── ohlcv_speed.py
+        └── requirements.txt
