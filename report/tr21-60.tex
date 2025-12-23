@@ -1,0 +1,360 @@
+\documentclass[graybox]{svmult}
+
+
+% choose options for [] as required from the list % in the
+%Reference Guide
+
+\usepackage{mathptmx}       % selects Times Roman as basic font
+\usepackage{helvet}         % selects Helvetica as sans-serif font
+\usepackage{courier}        % selects Courier as typewriter font
+\usepackage{type1cm}        % activate if the above 3 fonts are
+                            % not available on your system
+%
+\usepackage{makeidx}         % allows index generation
+\usepackage{graphicx}        % standard LaTeX graphics tool
+                             % when including figure files
+\usepackage{multicol}        % used for the two-column index
+\usepackage[bottom]{footmisc}% places footnotes at page bottom
+
+% -----------------------------------------------------------------------------------
+
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{xcolor, soulutf8}
+\newcommand{\highlight}[1]{\colorbox{yellow!50}{#1}}
+% \usepackage{outlines}
+% \usepackage{fancybox} % Tạo khung box
+% \usepackage{amsthm} % Cho phép thêm các môi trường định nghĩa
+% \usepackage{latexsym} % Các kí hiệu toán học
+% \usepackage{amsmath} % Hỗ trợ một số biểu thức toán học
+% \usepackage{amssymb} % Bổ sung thêm kí hiệu về toán học
+% \usepackage{amsbsy} % Hỗ trợ các kí hiệu in đậm
+% \usepackage{array} % Tạo bảng array
+\usepackage{enumitem} % Cho phép thay đổi kí hiệu của list
+% \usepackage{subfiles} % Chèn các file nhỏ, giúp chia các chapter ra nhiều file hơn
+\usepackage[small,compact]{titlesec} % Giúp chỉnh sửa các tiêu đề, đề mục như chương, phần,..
+\titlespacing{\section}{0pt}{*4}{*1.5}
+\usepackage{titletoc}
+% \usepackage{chngcntr} % Dùng để thiết lập lại cách đánh số caption,..
+\usepackage{pdflscape} % Đưa các bảng có kích thước đặt theo chiều ngang giấy
+% \usepackage{afterpage}
+% \usepackage[ruled,vlined]{algorithm2e}  % Hỗ trợ viết các giải thuật
+% \usepackage{capt-of} % Cho phép sử dụng caption lớn đối với landscape page
+% \usepackage{multirow} % Merge cells
+% \usepackage{fancyhdr} % Cho phép tùy biến header và footer
+% \usepackage{microtype}
+% \usepackage[natbib,backend=biber,style=ieee]{biblatex} % Giúp chèn tài liệu tham khảo
+% \usepackage{parskip}
+% \usepackage{listings}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+
+\usepackage{setspace}
+\edef\restoreparindent{\parindent=\the\parindent\relax}
+\usepackage{parskip}
+\restoreparindent
+\usepackage[utf8]{inputenc} % Cho phép nhập ký tự Unicode
+\usepackage[T5]{fontenc}    % Quan trọng: Bảng mã font T5 cho tiếng Việt
+\usepackage[vietnamese]{babel} % Hỗ trợ quy tắc ngắt dòng, đổi tên 'Table of Contents' -> 'Mục lục'
+% % package content table
+% \usepackage{tocbasic}
+
+% \usepackage{blindtext}
+
+% % custom packages
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{tabularray}
+\usepackage{lineno}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{scrextend} 
+ \usepackage{multirow}			% Multirow tables
+ \usepackage{subfig}
+\usepackage{array}
+\usepackage{lineno}
+\usepackage{graphicx}
+\usepackage{scrextend} 
+% to typeset URLs, URIs, and DOIs
+\usepackage{url}
+\usepackage{mathtools}
+%  \usepackage[dvips]{graphicx}
+%  \usepackage{epsfig}
+%  \usepackage{array}
+ \usepackage{epsf}
+% \usepackage{subfigure}
+\usepackage{indentfirst}
+
+%% The amssymb package provides various useful mathematical symbols
+\usepackage{amssymb}
+\renewcommand\tabularxcolumn[1]{m{#1}}
+\newcommand{\itemEq}[1]{%
+        \begingroup%
+        \setlength{\abovedisplayskip}{0pt}%
+        \setlength{\belowdisplayskip}{0pt}%
+        \parbox[c]{\linewidth}{\begin{flalign}#1&&\end{flalign}}%
+        \endgroup}
+\newcolumntype{Y}{>{\centering\arraybackslash}X}
+
+% see the list of further useful packages % in the Reference Guide
+
+\makeindex             % used for the subject index
+                       % please use the style svind.ist with
+                       % your makeindex program
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+\input{chapters/coverpage/coverpage}
+\title*{Xây dựng hệ thống thu thập và xử lý dữ liệu lớn cho thị trường chứng khoán ngân hàng dựa trên kiến trúc Lambda.}
+\titlerunning{Title}
+\author{Nguyễn Quốc Anh,Nguyễn Bảo Duy, Tạ Quốc Tuấn , Đoàn Ngọc Toàn , Lê Văn Quang Trung}
+
+\authorrunning{}
+
+
+\maketitle
+
+\abstract*{Trong kỷ nguyên kinh tế số, sự bùng nổ dữ liệu từ thị trường chứng khoán đang đặt ra những thách thức lớn đối với các hệ thống thông tin truyền thống về khả năng lưu trữ và tốc độ xử lý. Với đặc thù khối lượng khổng lồ (Volume) và tốc độ phát sinh liên tục (Velocity), dữ liệu giao dịch ngân hàng đòi hỏi các phương pháp tiếp cận chuyên biệt của công nghệ Dữ liệu lớn (Big Data). Trong dự án này, nhóm em triển khai quy trình xây dựng hệ thống thu thập và xử lý dữ liệu cổ phiếu từ các ngân hàng dựa trên kiến trúc Lambda. Đây là mô hình kiến trúc lai tối ưu, cho phép kết hợp khả năng lưu trữ dữ liệu lịch sử toàn vẹn tại lớp Batch và khả năng xử lý luồng dữ liệu thời gian thực tại lớp Speed. Thông qua việc triển khai kiến trúc này, nhóm em đề xuất một giải pháp pipeline dữ liệu mạnh mẽ, đảm bảo độ trễ thấp cho việc theo dõi biến động thị trường đồng thời phục vụ nhu cầu phân tích xu hướng dài hạn. Kết quả của dự án minh họa rõ nét tính hiệu quả của kiến trúc Lambda trong bài toán xử lý dữ liệu chứng khoán, tạo tiền đề cho các ứng dụng phân tích dự báo nâng cao.}
+
+\abstract{Trong kỷ nguyên kinh tế số, sự bùng nổ dữ liệu từ thị trường chứng khoán đang đặt ra những thách thức lớn đối với các hệ thống thông tin truyền thống về khả năng lưu trữ và tốc độ xử lý. Với đặc thù khối lượng khổng lồ (Volume) và tốc độ phát sinh liên tục (Velocity), dữ liệu giao dịch ngân hàng đòi hỏi các phương pháp tiếp cận chuyên biệt của công nghệ Dữ liệu lớn (Big Data). Báo cáo này trình bày quy trình xây dựng hệ thống thu thập và xử lý dữ liệu cổ phiếu từ các ngân hàng thương mại dựa trên kiến trúc Lambda. Đây là mô hình kiến trúc lai tối ưu, cho phép kết hợp khả năng lưu trữ dữ liệu lịch sử toàn vẹn tại lớp Batch và khả năng xử lý luồng dữ liệu thời gian thực tại lớp Speed. Thông qua việc triển khai kiến trúc này, nhóm nghiên cứu đề xuất một giải pháp pipeline dữ liệu mạnh mẽ, đảm bảo độ trễ thấp cho việc theo dõi biến động thị trường đồng thời phục vụ nhu cầu phân tích xu hướng dài hạn. Kết quả của dự án minh họa rõ nét tính hiệu quả của kiến trúc Lambda trong bài toán Big Data tài chính, tạo tiền đề cho các ứng dụng phân tích dự báo nâng cao.}
+
+\keywords{Big Data , Lambda Architecture , Stock Market Analysis}
+
+\section{Introduction}\label{sec:rel_res}
+%
+Thị trường chứng khoán là một trong những nguồn sinh ra dữ liệu lớn và phức tạp nhất trong nền kinh tế số. Sự biến động giá cả của các mã cổ phiếu diễn ra liên tục theo từng mili-giây, tạo ra một dòng chảy dữ liệu khổng lồ (Data Stream). Việc nắm bắt kịp thời các biến động này đóng vai trò quyết định trong việc quản trị rủi ro và tối ưu hóa lợi nhuận đầu tư. Tuy nhiên, các hệ thống cơ sở dữ liệu quan hệ (RDBMS) truyền thống thường gặp khó khăn trong việc đảm bảo đồng thời hai yếu tố: khả năng lưu trữ lịch sử dài hạn với chi phí thấp và khả năng xử lý dữ liệu thời gian thực với độ trễ thấp. Do đó, nhu cầu xây dựng một kiến trúc hệ thống có khả năng mở rộng (scalable) và chịu lỗi (fault-tolerant) để xử lý dữ liệu tài chính là vô cùng cấp thiết.
+ 
+Trong khuôn khổ dự án này, nhóm nghiên cứu tập trung vào bài toán \textbf{thu thập, lưu trữ và xử lý dữ liệu cổ phiếu của các Ngân hàng} từ các nguồn dữ liệu mở trên Internet. Bài toán này hoàn toàn phù hợp với các đặc trưng của công nghệ Dữ liệu lớn (Big Data) dựa trên các phân tích sau:
+\begin{itemize}
+    \item \textbf{Volume (Dung lượng):} Dữ liệu giao dịch chứng khoán tích lũy theo thời gian (giá mở cửa, đóng cửa, khối lượng giao dịch...) tạo nên kho dữ liệu lịch sử lớn, đòi hỏi các giải pháp lưu trữ phân tán như HDFS.
+    \item \textbf{Velocity (Tốc độ):} Dữ liệu thị trường được cập nhật liên tục trong phiên giao dịch. Hệ thống cần khả năng xử lý luồng (Stream processing) để cập nhật giá mới nhất gần như tức thời.
+    \item \textbf{Veracity (Tính xác thực):} Dữ liệu tài chính đòi hỏi độ chính xác tuyệt đối, không chấp nhận sai sót trong quá trình truyền tải và xử lý.
+\end{itemize}
+% To apply picture fuzzy sets with knowledge reasoning, the investigation was improved to develop  clinical decision making in DSSs \cite{Hai2022},
+\textbf{Phạm vi và giới hạn của đề tài:}
+Dự án tập trung triển khai \textit{Kiến trúc Lambda} bao gồm ba lớp: Batch Layer (xử lý lịch sử), Speed Layer (xử lý thời gian thực) và Serving Layer. Phạm vi dữ liệu giới hạn trong danh sách các mã cổ phiếu ngân hàng niêm yết tại Việt Nam (ví dụ: VCB, BID, CTG...)..\\
+\noindent
+\textbf{Đóng góp của báo cáo:}
+Dựa trên việc phân tích và triển khai thực nghiệm, những đóng góp chính của báo cáo này bao gồm:
+
+\begin{itemize}
+    \item Đề xuất và thiết kế chi tiết kiến trúc Lambda phù hợp cho bài toán xử lý dữ liệu chứng khoán, giải quyết xung đột giữa độ trễ thấp và độ chính xác cao.
+    \item Xây dựng hoàn chỉnh pipeline dữ liệu: Từ việc thu thập (Crawling/Kafka) đến xử lý song song (Spark/Hadoop) và lưu trữ phân tán.
+    \item Thực hiện trực quan hóa dữ liệu (Visualization), cung cấp cái nhìn tổng quan về xu hướng biến động của cổ phiếu ngân hàng hỗ trợ ra quyết định.
+\end{itemize}
+
+Nội dung chính của báo cáo sẽ được trình bày như sau : Phần 2 sẽ trình bày chi tiết về cấu trúc và thiết kế hệ thống Lambda ; Phần 3 sẽ trình bày chi tiết về thông tin cài đặt mã nguồn ; Phần 4 sẽ trình bày về kết quả mà nhóm đã triển khai được ; Phần 5 sẽ trình bày về những bài học mà cả nhóm đã lĩnh hội được trong suốt quá trình xây dựng kiến trúc ; Phần 6 sẽ nêu ra kết luận và hướng phát triển trong tương lai.
+\section{Architecture and Design} \label{sec:rel_res2}
+\subsection{Kiến trúc Lambda}
+Kiến trúc Lambda (Lambda Architecture) là một mô hình thiết kế phần mềm được giới thiệu bởi Nathan Marz, nhằm giải quyết thách thức về độ trễ (latency) và khả năng mở rộng (scalability) trong các hệ thống Big Data. Điểm cốt lõi của kiến trúc này là khả năng phân tách luồng xử lý thành hai nhánh song song để đạt được sự cân bằng giữa tốc độ và độ chính xác: một nhánh xử lý dữ liệu lịch sử toàn vẹn và một nhánh xử lý dữ liệu mới phát sinh theo thời gian thực.
+
+Như được minh họa trong Hình \ref{fig:pipeline_architecture}, cấu trúc của kiến trúc Lambda bao gồm ba lớp chính hoạt động phối hợp với nhau:
+
+\begin{itemize}
+    \item \textbf{Batch Layer (Lớp xử lý lô):} Đóng vai trò quản lý ``Master Dataset'' (\textit{All data}). Dữ liệu tại đây được lưu trữ vĩnh viễn và xử lý định kỳ thông qua quy trình \textit{Batch recompute} để tạo ra các khung nhìn dữ liệu lịch sử (\textit{Precomputed information}).
+    
+    \item \textbf{Speed Layer (Lớp tốc độ):} Xử lý các luồng dữ liệu mới đi vào hệ thống (\textit{Process stream}). Lớp này thực hiện các tính toán gia tăng thời gian thực (\textit{Realtime increment}) để cung cấp thông tin mới nhất mà Batch Layer chưa kịp xử lý.
+    
+    \item \textbf{Serving Layer (Lớp phục vụ):} Thực hiện cơ chế \textit{Merge} (hợp nhất). Khi có truy vấn (\textit{Query}), lớp này sẽ kết hợp kết quả từ \textit{Batch view} và \textit{Real-time view} để trả về dữ liệu toàn diện cho người dùng cuối.
+\end{itemize}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\linewidth]{Figure/lambda.png}
+    \caption{Sơ đồ kiến trúc tổng thể của hệ thống dựa trên mô hình Lambda}
+    \label{fig:pipeline_architecture}
+\end{figure}
+\subsection{Data Flow and Component Interaction Diagram}
+\section{Implementation Details}\label{sec:rel_res4}
+\subsection{Source code with full documentation}
+\subsection{Environment-specific configuration files}
+\subsection{Deployment strategy}
+\subsection{Monitoring setup}
+
+\section{Experimental results}\label{sec:rel_res4}
+
+
+\hl{}
+
+\hl{}
+
+\section{Lesson learned}\label{sec:disc}
+Trong quá trình triển khai kiến trúc Lambda để thu thập và xử lý dữ liệu cổ phiếu ngân hàng, nhóm nghiên cứu đã đúc kết được các bài học quan trọng sau đây:
+
+\subsection*{Lesson 1: Xử lý dữ liệu trùng lặp (Handling Duplicates) trong môi trường phân tán}
+\textbf{Category:} Data Ingestion, Data Quality Testing
+
+\subsubsection*{Problem Description}
+\begin{itemize}
+    \item \textbf{Context and background:} Crawler thu thập dữ liệu giao dịch (tick data) từ các cổng thông tin chứng khoán và đẩy vào Kafka. Spark Streaming tiêu thụ dữ liệu này.
+    \item \textbf{Challenges encountered:} Do cơ chế ``At-least-once delivery'' của Kafka và việc Crawler thỉnh thoảng retry khi gặp lỗi mạng, consumer (Spark) nhận được nhiều bản ghi trùng lặp của cùng một mã giao dịch.
+    \item \textbf{System impact:} Sai lệch khối lượng giao dịch tổng hợp (Total Volume), dẫn đến các chỉ báo dòng tiền (Money Flow) bị tính toán sai.
+\end{itemize}
+
+\subsubsection*{Approaches Tried}
+\begin{itemize}
+    \item \textbf{Approach 1:} Sử dụng \texttt{Distinct()} đơn giản trên luồng dữ liệu.
+    \item \textbf{Trade-offs:} Tốn chi phí shuffle dữ liệu lớn, hiệu năng giảm mạnh khi volume tăng cao.
+    \item \textbf{Approach 2:} Kiểm tra ID giao dịch trong Database bên ngoài (Redis) trước khi xử lý.
+    \item \textbf{Trade-offs:} Tạo nút thắt cổ chai (bottle-neck) tại Redis do độ trễ I/O mạng.
+\end{itemize}
+
+\subsubsection*{Final Solution}
+\begin{itemize}
+    \item \textbf{Detailed solution:} Sử dụng cơ chế \texttt{dropDuplicates()} tích hợp sẵn trong Spark Structured Streaming dựa trên khóa chính là sự kết hợp của \texttt{(StockSymbol, TransactionID, Timestamp)}. Kết hợp với việc giới hạn vùng watermark để Spark không phải giữ trạng thái khử trùng lặp mãi mãi.
+    \item \textbf{Implementation details:} 
+    \begin{verbatim}
+    df.withWatermark("timestamp", "10 minutes")
+      .dropDuplicates("transaction_id")
+    \end{verbatim}
+    \item \textbf{Metrics and results:} Loại bỏ 100\% các bản ghi trùng lặp trong cửa sổ 10 phút, độ trễ xử lý chỉ tăng không đáng kể (< 50ms).
+\end{itemize}
+
+\subsubsection*{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Technical insights:} Trong hệ thống Distributed Messaging như Kafka, việc xử lý Idempotency (tính nhất quán) tại tầng Consumer là bắt buộc.
+    \item \textbf{Best practices:} Luôn thiết kế pipeline chấp nhận dữ liệu trùng lặp và có cơ chế deduplication tại tầng xử lý.
+\end{itemize}
+
+\vspace{0.5cm} % Khoảng cách giữa các bài học
+
+\subsection*{Lesson 2: Quản lý trạng thái (State Management) cho các chỉ báo kỹ thuật phức tạp}
+\textbf{Category:} Lessons on Stream Processing
+
+\subsubsection*{Problem Description}
+\begin{itemize}
+    \item \textbf{Context and background:} Hệ thống cần tính toán đường trung bình động (MA - Moving Average) và RSI theo thời gian thực để cảnh báo mua/bán.
+    \item \textbf{Challenges encountered:} Các chỉ báo này phụ thuộc vào dữ liệu lịch sử (stateful). Spark Streaming mặc định xử lý theo micro-batch độc lập, gây khó khăn khi cần truy xuất giá trị của batch trước đó.
+    \item \textbf{System impact:} Không thể tính toán chính xác các biến động giá so với phiên trước, mất tính năng cảnh báo sớm.
+\end{itemize}
+
+\subsubsection*{Approaches Tried}
+\begin{itemize}
+    \item \textbf{Approach 1:} Lưu trạng thái vào HDFS/S3 và đọc lại ở mỗi batch.
+    \item \textbf{Trade-offs:} Độ trễ quá cao (high latency), không đáp ứng được yêu cầu Real-time.
+    \item \textbf{Approach 2:} Sử dụng biến toàn cục (Global variable) trên Driver.
+    \item \textbf{Trade-offs:} Không hoạt động trong môi trường phân tán (Distributed environment), mất dữ liệu khi Driver crash.
+\end{itemize}
+
+\subsubsection*{Final Solution}
+\begin{itemize}
+    \item \textbf{Detailed solution:} Sử dụng API \texttt{mapGroupsWithState} của Spark để duy trì trạng thái tùy chỉnh (arbitrary stateful processing) trong bộ nhớ của các Executor, được checkpoint định kỳ để chịu lỗi.
+    \item \textbf{Implementation details:} Định nghĩa lớp \texttt{StockState} lưu giữ tổng giá và số lượng tick trong cửa sổ trượt, tự động cập nhật khi có tick mới.
+    \item \textbf{Metrics and results:} Hỗ trợ tính toán MA20, MA50 realtime với độ trễ dưới 1 giây.
+\end{itemize}
+
+\subsubsection*{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Technical insights:} Với các bài toán Time-series stream, việc quản lý State Store (như HDFS backed state store của Spark) là yếu tố then chốt.
+    \item \textbf{Recommendations:} Cần cấu hình Checkpoint directory trên hệ thống file bền vững để đảm bảo Exactly-once processing khi ứng dụng khởi động lại.
+\end{itemize}
+
+\vspace{0.5cm}
+
+\subsection*{Lesson 3: Vấn đề ``Small Files'' trong lưu trữ HDFS tại Batch Layer}
+\textbf{Category:} Lessons on Data Storage, Performance Optimization
+
+\subsubsection*{Problem Description}
+\begin{itemize}
+    \item \textbf{Context and background:} Dữ liệu từ Kafka được Spark Streaming ghi liên tục xuống HDFS (Hadoop) để phục vụ Batch Layer huấn luyện mô hình.
+    \item \textbf{Challenges encountered:} Do chu kỳ ghi ngắn (trigger 1 phút/lần), HDFS bị ngập trong hàng triệu file kích thước rất nhỏ (vài KB).
+    \item \textbf{System impact:} NameNode của Hadoop bị quá tải bộ nhớ khi quản lý metadata, khiến các Job Spark Batch đọc dữ liệu cực chậm.
+\end{itemize}
+
+\subsubsection*{Approaches Tried}
+\begin{itemize}
+    \item \textbf{Approach 1:} Tăng thời gian trigger lên 1 giờ.
+    \item \textbf{Trade-offs:} Làm tăng độ trễ của dữ liệu xuất hiện trong Data Lake, ảnh hưởng đến đội ngũ phân tích dữ liệu (Data Analyst).
+\end{itemize}
+
+\subsubsection*{Final Solution}
+\begin{itemize}
+    \item \textbf{Detailed solution:} Triển khai quy trình \textbf{Compaction} (nén file) sử dụng Apache Airflow. Pipeline streaming vẫn ghi file nhỏ để đảm bảo độ trễ thấp, nhưng định kỳ mỗi đêm Airflow sẽ kích hoạt một Job Spark để gộp các file nhỏ thành file Parquet lớn hơn.
+    \item \textbf{Implementation details:} Job Compaction đọc toàn bộ file trong thư mục ngày hôm trước, thực hiện \texttt{coalesce(1)} cho từng partition và ghi đè lại.
+    \item \textbf{Metrics and results:} Số lượng file giảm 95\%, tốc độ đọc của Batch Layer tăng gấp 5 lần.
+\end{itemize}
+
+\subsubsection*{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Best practices:} Không bao giờ để nguyên hiện trạng file từ Streaming ghi xuống HDFS lâu dài. Cần có chiến lược ``Compact'' định kỳ.
+    \item \textbf{Technical insights:} HDFS được tối ưu cho việc đọc file lớn (large blocks), không phải file nhỏ.
+\end{itemize}
+
+\vspace{0.5cm}
+
+\subsection*{Lesson 4: Xử lý Backfill và phụ thuộc dữ liệu với Apache Airflow}
+\textbf{Category:} Lessons on System Integration
+
+\subsubsection*{Problem Description}
+\begin{itemize}
+    \item \textbf{Context and background:} Batch Layer cần chạy mô hình huấn luyện lại (Retrain model) hàng ngày, nhưng chỉ được chạy khi dữ liệu của ngày đó đã được thu thập đầy đủ.
+    \item \textbf{Challenges encountered:} Đôi khi Crawler bị lỗi, dữ liệu ngày hôm đó bị thiếu. Job huấn luyện vẫn chạy trên dữ liệu rỗng hoặc thiếu, tạo ra mô hình chất lượng kém (Underfitting).
+    \item \textbf{System impact:} Dự đoán sai xu hướng cổ phiếu ngày hôm sau.
+\end{itemize}
+
+\subsubsection*{Approaches Tried}
+\begin{itemize}
+    \item \textbf{Approach 1:} Đặt lịch cố định (Cron) vào 12h đêm.
+    \item \textbf{Trade-offs:} Không đảm bảo tính toàn vẹn dữ liệu (Data Integrity).
+\end{itemize}
+
+\subsubsection*{Final Solution}
+\begin{itemize}
+    \item \textbf{Detailed solution:} Sử dụng \textbf{Airflow Sensors}. Tạo một task kiểm tra sự tồn tại của file \texttt{\_SUCCESS} hoặc số lượng bản ghi tối thiểu trong HDFS trước khi trigger task huấn luyện. Nếu dữ liệu thiếu, Airflow sẽ gửi cảnh báo và không chạy model.
+    \item \textbf{Implementation details:} Sử dụng \texttt{HdfsSensor} kết hợp với cơ chế \texttt{SLA} (Service Level Agreement) để cảnh báo nếu dữ liệu đến muộn quá 2 giờ.
+    \item \textbf{Metrics and results:} Đảm bảo 100\% các model được deploy đều được huấn luyện trên tập dữ liệu đầy đủ.
+\end{itemize}
+
+\subsubsection*{Key Takeaways}
+\begin{itemize}
+    \item \textbf{System Integration:} Airflow không chỉ là công cụ lập lịch (Scheduler) mà là công cụ quản lý sự phụ thuộc (Dependency Manager) hiệu quả.
+    \item \textbf{Recommendations:} Luôn sử dụng Sensor để validate đầu vào (Input Validation) trước khi thực hiện các task tốn kém tài nguyên.
+\end{itemize}
+
+\vspace{0.5cm}
+
+\subsection*{Lesson 5: Tối ưu hóa truy vấn Elasticsearch cho dữ liệu chuỗi thời gian}
+\textbf{Category:} Lessons on Data Storage, Monitoring Debugging
+
+\subsubsection*{Problem Description}
+\begin{itemize}
+    \item \textbf{Context and background:} Kibana truy vấn dữ liệu từ Elasticsearch để vẽ biểu đồ nến (Candlestick chart). Dữ liệu tích lũy theo thời gian lên tới hàng tỷ bản ghi.
+    \item \textbf{Challenges encountered:} Truy vấn lấy dữ liệu lịch sử 1 năm của một mã cổ phiếu mất hơn 10 giây, gây trải nghiệm kém cho người dùng.
+    \item \textbf{System impact:} Dashboard bị treo (timeout), Cluster Elasticsearch báo trạng thái Red do thiếu bộ nhớ heap.
+\end{itemize}
+
+\subsubsection*{Approaches Tried}
+\begin{itemize}
+    \item \textbf{Approach 1:} Tăng RAM cho Elasticsearch Node.
+    \item \textbf{Trade-offs:} Chi phí hạ tầng tăng cao nhưng hiệu năng không cải thiện tuyến tính.
+\end{itemize}
+
+\subsubsection*{Final Solution}
+\begin{itemize}
+    \item \textbf{Detailed solution:} Áp dụng chiến lược \textbf{Index Lifecycle Management (ILM)} và \textbf{Time-based partitioning}. Chia nhỏ index theo tháng (ví dụ: \texttt{stocks-2024-05}, \texttt{stocks-2024-06}).
+    \item \textbf{Implementation details:}
+    \begin{itemize}
+        \item Hot Phase: Index tháng hiện tại (Read/Write).
+        \item Warm/Cold Phase: Index các tháng cũ được chuyển sang trạng thái Read-only và nén (Force Merge).
+    \end{itemize}
+    \item \textbf{Metrics and results:} Thời gian truy vấn giảm xuống dưới 1 giây. Dung lượng lưu trữ giảm 30\% nhờ nén dữ liệu cũ.
+\end{itemize}
+
+\subsubsection*{Key Takeaways}
+\begin{itemize}
+    \item \textbf{Scaling:} Việc chia nhỏ Index (Sharding/Partitioning) dựa trên thời gian là bắt buộc đối với dữ liệu Time-series lớn.
+    \item \textbf{Optimization:} Quản lý vòng đời dữ liệu (Hot/Warm architecture) giúp cân bằng giữa hiệu năng và chi phí.
+\end{itemize}
+ 
+\section{Conclusion}\label{sec:disc}
+Báo cáo này đã trình bày toàn diện quy trình thiết kế và hiện thực hóa hệ thống xử lý dữ liệu lớn cho thị trường chứng khoán ngân hàng dựa trên kiến trúc Lambda, khẳng định tính hiệu quả của mô hình này trong việc giải quyết bài toán cân bằng giữa lưu trữ lịch sử quy mô lớn và xử lý thời gian thực. Về mặt thực tiễn, nhóm nghiên cứu đã thiết lập thành công hạ tầng phân tán trên nền tảng Docker và hoàn thiện pipeline dữ liệu khép kín, từ khâu thu thập qua Kafka đến việc xử lý song song tại hai lớp Batch và Speed, với kết quả cuối cùng được thể hiện trực quan trên Dashboard theo dõi biến động thị trường. Mặc dù hệ thống đã đáp ứng tốt các yêu cầu cơ bản về độ trễ và tính toàn vẹn dữ liệu, nhóm nghiên cứu đề xuất các hướng phát triển nâng cao trong tương lai, trọng tâm là việc tích hợp các mô hình Học sâu (Deep Learning) như LSTM hay Transformer để dự báo xu hướng giá, đồng thời mở rộng phạm vi phân tích sang các nguồn dữ liệu phi cấu trúc như tin tức và mạng xã hội nhằm tối ưu hóa giá trị hỗ trợ ra quyết định của hệ thống.
+\section*{Acknowledgments}
+
+
+
+\begin{thebibliography}{99}
+
+%
+
+\end{thebibliography}
+\end{document}
